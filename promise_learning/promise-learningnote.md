@@ -70,7 +70,7 @@ const promisifyreadfile = util.promisify(fs.readFile);
 可用作`then((undefined,(value)=>{})`
 
 ## 五.promise的自封装
-简易的子封装promise见文件[mypromise.js](mypromise.js)   
+简易的自封装promise见文件[mypromise.js](mypromise.js)   
 
 
 
