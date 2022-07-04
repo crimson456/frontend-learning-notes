@@ -1,25 +1,50 @@
 # Promise Learning
 
 ## 一.promise的封装
-1.把一个方法封装成promise对象
+1. 把一个方法封装成promise对象（以nodejs内置readFile为例）
 
-```javascript
-function promisifyreadfile(path) {
-    return new Promise((resolve, reject) => {
-        require('fs').readFile(path, (err, data) => {
-            if (err) reject(err);
-            resolve(data);
+    ```js
+    function promisifyreadfile(path) {
+        return new Promise((resolve, reject) => {
+            require('fs').readFile(path, (err, data) => {
+                if (err) reject(err);
+                resolve(data);
+            })
         })
-    })
-}
-```
-用node自带的util模块下的`promisify`方法封装  
-将错误优先的回调风格的函数（也就是将 (err, value) => ... 回调作为最后一个参数）转换为promise对象
-```
-const util = require('util');
-const fs = require('fs');
-const promisifyreadfile = util.promisify(fs.readFile);
-```
+    }
+    ```
+
+2. 用node自带的util模块下的`promisify`方法封装  
+    `util.promisify()`方法将错误优先的回调风格的函数（也就是将 (err, value) => ... 回调作为最后一个参数）转换为promise对象
+    
+    ```js
+    const util = require('util');
+    const fs = require('fs');
+    const promisifyreadfile = util.promisify(fs.readFile);
+    ```
+
+## Promise 对象
+1. 属性
+    1. PromiseState
+
+    2. PromiseResult
+
+2. 构造对象下的方法
+    1. ``
+    2. ``
+    3. ``
+    4. ``
+    5. ``
+    6. ``
+
+3. 实例对象下的方法
+    1. ``
+    2. ``
+    3. ``
+    4. ``
+
+
+
 
 ## 二.promise实例的属性
 一个promise实例下有两个属性`PromiseState`和`PromiseResult`  
