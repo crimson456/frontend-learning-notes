@@ -35,9 +35,19 @@
     <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
     <script>
-        var foo = Symbol('aaa')
-        var boo = Symbol.for('bbb')
-        console.log(Symbol.keyFor('bbb'));
+        function f(a) {
+            return function(b) {
+                return function(c) {
+                    return a + b + c;
+                }
+            }
+        }
+
+        function d(a, b, c) {
+            return a + b + c;
+        }
+        console.log(f(1)(2)(3));
+        console.log(d(10, 20, 30));
     </script>
     </body>
 

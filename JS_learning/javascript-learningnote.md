@@ -200,6 +200,7 @@
 
    5. `Object.prototype.toLocaleString()`  
       返回一个该对象的字符串表示,用于派生对象特定语言环境重载
+
    6. `Object.prototype.valueOf()`  
       方法返回对象的原始值
 
@@ -398,7 +399,9 @@
 
 1. 属性: 
    1.`String.length`字符串的长度
+
 2. 构造对象上的方法：
+
    1. `String.raw(p1,p2)`或用反引号代替括号，内部放模板字符串
       返回模板字符串的原始字符串，p1，p2 查文档??
 
@@ -669,8 +672,6 @@
 
 ## Symbol 对象
 
-
-
 1. 属性
    1. `Symbol.prototype.description`变量的描述字符串
 
@@ -687,37 +688,51 @@
       返回symbol类型对象在全局注册表中的key值
 
 3. 内置的Symbol相关属性
-   内置Symbol属性用于定义一些默认行为，详细查文档
-   1. `Symbol.iterator`定义迭代方法，被for/of语句调用
-   2. `Symbol.hasInstance`被instance语句调用
-   3. `Symbol.isConcatSpreadable`布尔值，定义`Array.prototype.concat(...p1)`中参数是否可以展开
-   4. `Symbol.species`getter函数属性，函数返回值定义其衍生对象的父类，被如`Array.prototype.map()`等方法调用
-   5. `Symbol.match`
-   6. ``
-   7. ``
-   8. ``
-   9. ``
-   10. ``
-   11. ``
+   内置Symbol属性用于定义或修改一些默认行为，详细查文档
 
-Symbol.asyncIterator
+   1. `Object.prototype[Symbol.iterator]`定义迭代方法，被for/of语句调用
+
+   2. `Object.prototype[Symbol.hasInstance]`被instance语句调用，一般为类下的静态方法
+   
+   3. `Object.prototype[Symbol.isConcatSpreadable]`布尔值，定义对象被`Array.prototype.concat()`作为参数调用时时是否可以展开
+   
+   4. `Object.prototype[Symbol.species]`getter函数属性，函数返回值定义其衍生对象的父类，在如`Array.prototype.map()`等方法返回默认构造函数时调用，一般为类下的静态getter方法
+   
+   5. `RegExp.prototype[Symbol.match]`函数属性，当正则对象作为`String.prototype.match()`方法的参数调用时执行次函数，将调用方法的字符串实例作为此方法的第一个实参，返回值作为结果
+
+   6. `RegExp.prototype[Symbol.matchAll]`函数属性，当正则对象作为`String.prototype.matchAll()`方法的参数调用时执行此函数，将调用方法的字符串实例作为此方法的第一个实参，返回值作为结果
+
+   7. `RegExp.prototype[Symbol.replace]`函数属性，当正则对象作为`String.prototype.replace()`方法的参数调用时执行此函数，将调用方法的字符串实例作为此方法的第一个实参，返回值作为结果
+
+   8. `RegExp.prototype[Symbol.search]`函数属性，当正则对象作为`String.prototype.search()`方法的参数调用时执行此函数，将调用方法的字符串实例作为此方法的第一个实参，返回值作为结果
+
+   9. `RegExp.prototype[Symbol.split]`函数属性，当正则对象作为`String.prototype.split()`方法的参数调用时执行此函数，将调用方法的字符串实例作为此方法的第一个实参，返回值作为结果
+
+   10. `Object.prototype[Symbol.toPrimitive]`函数属性，返回值为对象参与运算时被强制转换的值，接收一个参数有三个可选值(number、string、default)对应对象被作为数字、字符串、既可数字又可字符串参与运算
+   
+   11. `Object.prototype[Symbol.toStringTag]`getter函数属性，返回值为对象被`Object.prototype.toString.call()`方法调用后返回的字符串的第二段，一般定义类型
+
+   12. `Object.prototype[Symbol.unscopables]`对象属性，以此对象的所有属性名为属性名，属性值为布尔值，规定在对象被`with`语句调用扩展作用域链时，对应的属性是否有效
+
+   13. `Object.prototype[Symbol.asyncIterator]`函数属性，返回一个异步遍历器，被`for await/of`语句（ES9）调用
 
 
 
 
-Symbol.matchAll
-Symbol.replace
-Symbol.search
 
-Symbol.split
-Symbol.toPrimitive
-Symbol.toStringTag
-Symbol.unscopables
+
+
+
+
+
+
+
+
+
 
 
 ## Promise 对象
 见文档[Promise Learning](promise-learningnote.md)
-
 
 
 
@@ -780,7 +795,7 @@ Symbol.unscopables
 
 
 
-## 生成器和异步
+## 生成器和异步执行的实现
 
 1. 生成器函数
    1. `function*`
@@ -817,9 +832,9 @@ Symbol.unscopables
 
 2. `Generator`生成器对象对象下的方法：
    1. `Generator.prototype.next(value)`
-      表示进行入下一步，value作为当前yield的左值传递给生成器函数，返回迭代结果的对象
+      表示进行入下一步，value作为上一个yield的左值传递给生成器函数，返回迭代结果的对象
       >迭代结果的对象包括两个属性：
-      >value:下一个yield的右值
+      >value:当前yield的右值
       >done:遍历是否结束
 
    2. `Generator.prototype.return(value)`
@@ -831,18 +846,67 @@ Symbol.unscopables
       >exception为错误实例
       >调用此方法同样会进行一次迭代，并且不影响后续迭代
 
-3. co函数
+3. Thunk函数和Promise封装
+   
+   Thunk函数将多参数函数封装成返回值为单参数为回调函数的函数
+   ```js
+   // 正常版本的readFile（多参数版本）
+   fs.readFile(fileName, callback);
+
+   // Thunk版本的readFile（单参数版本）
+   var Thunk = function (fileName) {
+     return function (callback) {
+       return fs.readFile(fileName, callback);
+     };
+   };
+   ```
+
+
+   将Tunck函数作为yield语句的右值可以让生成器调用next()方法时获取此Thunk函数，然后执行此Thunk函数将执行后的结果传入下一个next()方法，就可以实现异步代码同步执行的模型
+
+   同理，将异步任务封装在一个Promise对象中，作为yield语句的右值让生成器调用next()方法时获取此Promise对象，然后等待promise对象中的异步任务执行完毕后，调用then()方法中的resolve函数获取结果并传入下一个next()方法，也可以实现异步代码同步执行
+
+4. co模块
+   co模块可以实现生成器的自执行  
+   co模块的核心思路：
+   ```js
+   var gen = function* (){
+      //readFile为promise封装
+     var f1 = yield readFile('/etc/fstab');
+     var f2 = yield readFile('/etc/shells');
+   };
+   co(gen);
+   function co(gen){
+      let generator=gen()
+      function next(result){
+         if(result) return;
+         result.value.then(v=>{
+            next(generator.next(v))
+         });
+      }
+      next(generator.next());
+   };
+   ```
+   这就是async函数和await语句的雏形
+   并且，co模块可以处理并发的异步操作，需要把多个异步任务封装成对象或数组放入yield语句右值
 
 
 
+## async函数和await语句
+
+   async函数和await语句就是生成器函数的语法糖
+
+   async函数返回一个Promise对象，async函数中的返回值作为返回对象的then方法的resolve函数参数
 
 
 
+   >注意：
+   >1. await命令后面的Promise对象，运行结果可能是rejected，所以最好把await命令放在try...catch代码块中
+   >2. 多个await命令后面的异步操作，如果不存在继发关系，最好让它们同时触发
+   >3. await命令只能用在async函数之中
+   >4. async函数可以保留运行堆栈(错误堆栈)
 
-
-## 生成器+promise实现异步  co函数
-
-
+   顶层await（ES2022）用于ES6模块的异步加载
 
 
 
