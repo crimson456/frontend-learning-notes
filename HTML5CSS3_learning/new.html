@@ -35,23 +35,9 @@
     <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
     <script>
-        function* gen() {
-            let count = 0
-            while (count < 5) {
-                try {
-                    yield count++;
-                } catch (e) {
-                    console.log("Error caught!");
-                }
-            }
-            return 10
-        }
-
-        var g = gen();
-        console.log(g.next()); // { value: 42, done: false }
-        console.log(g.throw(new Error("Something went wrong"))); // "Error caught!"
-        console.log(g.next());
-        console.log(g.return());
+        var foo = Symbol('aaa')
+        var boo = Symbol.for('bbb')
+        console.log(Symbol.keyFor('bbb'));
     </script>
     </body>
 

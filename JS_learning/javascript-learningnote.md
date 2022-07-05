@@ -89,7 +89,7 @@
          ```
 
       2. `Object.defineProperties(p1,p2)`  
-         为目标对象 p1 定义多个属性并作为返回值，p2 为以属性名和属性描述对象为键 值对 的对象形式
+         为目标对象 p1 定义多个属性并作为返回值，p2 为以属性名和属性描述对象为键值对的对象形式
 
          ```js
          const object1 = {};
@@ -340,7 +340,6 @@
          查询数组中是否有 p1，返回最后一个查询到的索引值，不存在则返回-1  
          p2 为查询开始的索引，如果为负开始位置从末尾计算，顺序都是从前向后
 
-      4. ``
 
    4. 取值相关:(不修改原数组)
 
@@ -666,6 +665,56 @@
 
 
 
+
+
+## Symbol 对象
+
+
+
+1. 属性
+   1. `Symbol.prototype.description`变量的描述字符串
+
+2. 方法
+   1. `Symbol(description)`
+      生成一个唯一的symbol类型的变量
+
+   2. `Symbol.for(key)`
+      根据key值在全局注册表中注册一个symbol类型对象，如果存在，则返回此对象
+      >key值也会作为此symbol对象的描述字符串
+      >`Symbol()`方法并不会在全局注册表中注册，所以生成的变量没有key值也不能用`keyFor()`方法查询
+
+   3. `Symbol.keyFor(symbolObj)`
+      返回symbol类型对象在全局注册表中的key值
+
+3. 内置的Symbol相关属性
+   内置Symbol属性用于定义一些默认行为，详细查文档
+   1. `Symbol.iterator`定义迭代方法，被for/of语句调用
+   2. `Symbol.hasInstance`被instance语句调用
+   3. `Symbol.isConcatSpreadable`布尔值，定义`Array.prototype.concat(...p1)`中参数是否可以展开
+   4. `Symbol.species`getter函数属性，函数返回值定义其衍生对象的父类，被如`Array.prototype.map()`等方法调用
+   5. `Symbol.match`
+   6. ``
+   7. ``
+   8. ``
+   9. ``
+   10. ``
+   11. ``
+
+Symbol.asyncIterator
+
+
+
+
+Symbol.matchAll
+Symbol.replace
+Symbol.search
+
+Symbol.split
+Symbol.toPrimitive
+Symbol.toStringTag
+Symbol.unscopables
+
+
 ## Promise 对象
 见文档[Promise Learning](promise-learningnote.md)
 
@@ -688,16 +737,15 @@
       1. 遍历得到的是属性值(value)
       2. 只能用于部署了Symbol.iterator属性的对象
 
-2. 迭代器iterator
+2. 可迭代对象和迭代器iterator
 
-   1. 存在方法:
-      * `next()`
-         调用后迭代至下一项
-         返回一个包含value和done属性的对象
-      * `__iterator__()`
+   可迭代对象下必须部署`[Symbol.iterator]`属性，属性为一个函数，返回一个迭代器
+
+   迭代器上必须存在`next()`方法，调用后迭代至下一项，返回一个包含value和done属性的对象
 
 
-   2. 模拟可迭代对象：
+
+   模拟可迭代对象：
    ```js
    const obj = {
      [Symbol.iterator] : function () {
@@ -715,7 +763,7 @@
    ```
 
 
-3. 原生的可迭相关方法
+3. 原生的可迭代对象相关方法
    1. `Array|TypedArray|String|Map|Set.prototype[Symbol.iterator]()`
       返回包含键值的迭代器
       >注意：此方法要调用后获取返回值为迭代器，不是属性
@@ -736,8 +784,28 @@
 
 1. 生成器函数
    1. `function*`
-      定义一个生成器函数，返回Generator对象
+      定义一个生成器函数，返回一个Generator对象
       >生成器函数可以用于部署迭代器
+      >生成器函数中直接使用this和普通函数一样指向调用者(一般为window)，但是生成器函数总会返回一个生成器对象
+      >构造函数要求返回一个实例对象，所以不能将生成器函数用作构造函数执行new操作符
+      >通过函数下的call()方法改变this指向为生成器函数的原型对象后并封装在一个函数的返回值中后，封装函数可用于构造函数
+      ```js
+      function* gen() {
+        this.a = 1;
+        yield this.b = 2;
+        yield this.c = 3;
+      }
+      function F() {
+        return gen.call(gen.prototype);
+      }
+      var f = new F();
+      f.next();  // Object {value: 2, done: false}
+      f.next();  // Object {value: 3, done: false}
+      f.next();  // Object {value: undefined, done: true}
+      f.a // 1
+      f.b // 2
+      f.c // 3
+      ```
 
    2. `yield`语句和`yield*`语句
       `yield`语句用于生成器函数每一次迭代执行（next()、throw()、return()方法的调用）的分隔以及定义迭代结果对象的value值
@@ -747,7 +815,7 @@
       `return`语句用于结束迭代，并定义迭代结果对象的value值
 
 
-2. `Generator`对象下的方法：
+2. `Generator`生成器对象对象下的方法：
    1. `Generator.prototype.next(value)`
       表示进行入下一步，value作为当前yield的左值传递给生成器函数，返回迭代结果的对象
       >迭代结果的对象包括两个属性：
@@ -763,7 +831,13 @@
       >exception为错误实例
       >调用此方法同样会进行一次迭代，并且不影响后续迭代
 
-2. co函数
+3. co函数
+
+
+
+
+
+
 
 
 ## 生成器+promise实现异步  co函数
