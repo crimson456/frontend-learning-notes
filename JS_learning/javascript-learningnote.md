@@ -910,17 +910,72 @@
 
 
 
+
+
+
+## 模块化
+1. 发展历史：
+   AMD require.js  浏览器
+   CMD sea.js  
+   CommonJS Node.js  服务端
+   UMD  
+   [自写简易模块管理系统](./my-module.js)
+
+2. ES6模块化
+   1. 特点：
+      1. 强制使用严格模式
+      2. 后加载（所有模块全部加载解析完毕后执行，且语句必须放在顶层）
+         >所以可以多次加载，但是只执行一次
+         >(CommonJS 为运行时加载，可以放在代码块中)
+      3. 实时动态(CommonJS 则是静态)
+         >可以获取模块内部动态的值
+
+   2. 语法：
+      ```js
+      //按需导入
+      export { foo , boo as myboo }
+      import { foo as myfoo , myboo } from 'url'
+
+      //全部加载
+      import * as foo from 'url'
+
+      //默认加载
+      export default foo
+      import foo from 'url'
+
+      //混合加载写法
+      import foo,{ boo as myboo } from 'url'
+
+      //先导入后导出的混合写法
+      export foo from 'url'
+      ```
+      `import(url)`函数(ES2020)返回一个Promise对象实现异步加载
+
+3. CommonJS,Sea.js
+
+
+
+
+
+
+
+
+
+
+## Set 对象
+
+
+## Map 对象
+
+
+
+
+
 ## 高级语法
 5. getter/setter
 
 
-7. 生成器generator
-   1. 存在方法：
-      * `next()`
-      * `return()`
-      * `throw()`
-      * `close()`
-      * `send()`
+
 
 
 
