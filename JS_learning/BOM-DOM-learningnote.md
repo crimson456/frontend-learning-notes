@@ -179,7 +179,7 @@ url 格式：
    4. `history.pushState()`
    5. `history.replaceState`
 
-## Navigator 对象 history.
+## Navigator 对象
 
 浏览器相关的属性和方法
 
@@ -523,7 +523,7 @@ normalize()
 
 3.
 
-## 事件和Event 事件对象
+## 事件和 Event 事件对象
 
 1. 监听事件:(以eventtype为例)
 
@@ -661,7 +661,7 @@ normalize()
 
    11. ajax进度:
 
-      1. `readystatechange`readyState 改变时触发 
+      1. `readystatechange`当`readyState`改变时触发 
       7. `abort`xhr 对象调用`abort()`函数(终止请求)触发
       8. `error`请求遇到错误触发，如断网
       9. `load`xhr 对象请求完成时触发
@@ -670,9 +670,69 @@ normalize()
       12. `progress`请求接收到数据的时候被周期性触发
       13. `timeout`请求超时触发
 
-   12. 其他：
+   12. 存储：
       
        1.  `storage`存储区域被修改时触发
+
+
+
+
+## Worker 对象 基本使用
+1. 构造函数
+   ```js
+   new Worker(url, options)
+   ```
+   创建一个Worker对象  
+   url为脚本地址  
+   options包括type、credentials、name，用于调试？
+
+2. Worker基本用法
+
+   ```js
+   //index.html
+      <script src="./main.js"></script>
+   //main.js
+      //创建Worker对象
+      let myWorker = new Worker('./worker.js')
+      //发送数据到worker
+      myWorker.postMessage({})
+      //从worker接收数据
+      myWorker.addEventListener('message', function(e) {
+         console.log(e.data);
+      })
+      //从worker接收到无法反序列化的对象
+      myWorker.addEventListener('message', function(e) {
+         console.log(e.data);
+      })
+      //终止worker
+      myWorker.terminate()
+
+
+   //worker.js
+      //发送数据到主线性
+      self.postMessage({})
+      //接收主线程的数据
+      self.addEventListener('message', function(e) {
+         console.log(e.data);
+      })
+   ```
+   
+   >注意：worker内，不能直接操作 DOM 节点，也不能使用window对象的默认方法和属性
+   >普通worker只能被创建它的脚本使用
+   >tips：在chrome等浏览器worker不能访问本地文件，IE可以（调试用）
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## 拓展
