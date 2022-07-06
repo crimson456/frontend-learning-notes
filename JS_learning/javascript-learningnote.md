@@ -66,6 +66,24 @@
       (expression for (variable in object) if (condition) )
       ```
 
+5. 普通属性和存储器属性
+   对象下的属性可以分成普通属性和存储器属性
+   1. 普通属性：固定的值或变量
+   2. 存储器属性：getter和setter函数，在访问时判断赋值取值操作并执行对应getter/setter函数
+   ```js
+   let obj = {
+       //普通属性
+       a: 10,
+       //访问器属性
+       get b() {
+           return 20
+       },
+       set b(value) {
+           return value
+       }
+   }
+   ```   
+
 
 ## 顶级对象 Object
 
@@ -176,10 +194,10 @@
       > `assign()`第一层为深拷贝，从第二层开始为浅拷贝
 
    8. `Object.entries(p1)`
-      返回对象的可枚举属性的键值对数组
+      返回p1对象的可枚举属性的键值对可迭代对象
 
    9. `Object.fromEntries(p1)`
-      返回 p1 键值对的对象形式
+      返回p1键值对可迭代对象的对象形式
 
 2. 原型链上的方法：
    包括：检测是否存在成员、检测是否在某对象原型链上、返回对象描述、返回原始值
@@ -203,6 +221,10 @@
 
    6. `Object.prototype.valueOf()`  
       方法返回对象的原始值
+
+
+
+
 
 ## Function 对象
 
@@ -405,80 +427,80 @@
    1. `String.raw(p1,p2)`或用反引号代替括号，内部放模板字符串
       返回模板字符串的原始字符串，p1，p2 查文档??
 
-   2. `fromCharCode(...numbers)`
+   2. `String.fromCharCode(...numbers)`
       根据numbers对应的UTF-16字符返回字符串
 
-   3. `fromCodePoint(...numbers)`
+   3. `String.fromCodePoint(...numbers)`
       根据numbers对应的unicode编码位置返回字符串
 
 
 
 3. 原型对象上的方法:
 
-   1. `charAt(index)`
+   1. `String.prototype.charAt(index)`
       根据索引号返回对应字符，相当于`'somestring'[index]`
 
-   2. `concat(...strings)`
+   2. `String.prototype.concat(...strings)`
       合并字符串并返回，不影响原字符串
 
-   3. `endsWith(searchString,length)`
+   3. `String.prototype.endsWith(searchString,length)`
       判断当前字符串是否是以目标字符串结尾，返回布尔值
       >length参数指定函数计算的末尾
 
-   4. `includes(searchString,index)`
+   4. `String.prototype.includes(searchString,index)`
       判断当前字符串是否包含另一个字符串，返回布尔值
       >index指定开始检索的位置
 
-   5. `indexOf(searchValue,fromIndex)`
+   5. `String.prototype.indexOf(searchValue,fromIndex)`
       查询第一次出现字符的索引，从左向右
       >fromIndex指定开始查询的位置，小于零从头开始，大于长度从最后一个开始
 
-   6. `lastIndexOf(searchValue,fromIndex)`
+   6. `String.prototype.lastIndexOf(searchValue,fromIndex)`
       查询最后一次出现字符的索引，从右（fromIndex值处）向左
 
-   7. `localeCompare(compareString,locales,options)`
+   7. `String.prototype.localeCompare(compareString,locales,options)`
       返回一个数字来指示一个参考字符串是否在排序顺序前面或之后或与给定字符串相同？
 
-   8.  `match(regexp)`
+   8.  `String.prototype.match(regexp)`
       返回当前字符串匹配正则表达式的结果
       >如果正则为全局模式g，则返回所有匹配项组成的数组，但无捕获组等其他信息（粗略）
       >如果正则不为全局模式g，则只返回第一个匹配项的完整信息数组，包括捕获组（详细）
 
-   9.  `matchAll(regexp)`
+   9.  `String.prototype.matchAll(regexp)`
       返回一个包含所有匹配正则表达式的结果及分组捕获组的迭代器
 
-   10. `normalize(form)`
+   10. `String.prototype.normalize(form)`
       根据规定的形式返回对应形式的规范字符串
 
-   11. `padEnd(targetLength, padString)`
+   11. `String.prototype.padEnd(targetLength, padString)`
       将padString补充在当前字符串后方，超出则舍弃，不够则重复添加至达到目标超度
 
-   12. `padStart(targetLength , padString)`
+   12. `String.prototype.padStart(targetLength , padString)`
       将padString补充在当前字符串前方，超出则舍弃，不够则重复添加至达到目标超度
 
-   13. `repeat(count)`
+   13. `String.prototype.repeat(count)`
       返回将当前字符串复制count次并拼接起来的新字符串
 
 
-   14. `replace(regexp|substr, newSubStr|function)`
+   14. `String.prototype.replace(regexp|substr, newSubStr|function)`
       替换对应第一个字符串或正则表达式匹配项为新的字符串或用函数修改，返回新的字符串
 
-   15. `replaceAll(regexp|substr, newSubstr|function)`
+   15. `String.prototype.replaceAll(regexp|substr, newSubstr|function)`
       替换对应字符串或正则表达式匹配项为新的字符串或用函数修改，返回新的字符串
 
-   16. `search(regexp)`
+   16. `String.prototype.search(regexp)`
       返回正则表达式在字符串中首次匹配项的索引
 
-   17. `slice(beginIndex, endIndex)`
+   17. `String.prototype.slice(beginIndex, endIndex)`
       返回从开始索引到结束索引之间的字符串
 
-   18. `split(separator, limit)`
+   18. `String.prototype.split(separator, limit)`
       根据分隔符（字符串或正则表达式）将字符串分割成字符串片段，并返回对应限制数量片段的数组
 
-   19. `startsWith(searchString, startIndex)`
+   19. `String.prototype.startsWith(searchString, startIndex)`
       判断当前字符串对应索引是否是以目标字符串开头，返回布尔值
 
-   20. `substring(startIndex, endIndex)`
+   20. `String.prototype.substring(startIndex, endIndex)`
       返回从开始索引到结束索引之间的字符串
       >类似`slice()`方法，参数为负或其他时有不同 
 
@@ -498,19 +520,20 @@
       返回字符串删除前方的空白的形式，但不改变原字符串
 
 
-   26. `charCodeAt(index)`
+   26. `String.prototype.charCodeAt(index)`
       根据索引号返回对应字符的UTF-16编码？
 
-   27. `codePointAt(index)`
+   27. `String.prototype.codePointAt(index)`
       返回一个Unicode 编码点值的非负整数？
 
 
-   28. `toLocaleLowerCase()`
-   29. `toLocaleUpperCase()`
+   28. `String.prototype.toLocaleLowerCase()`
+   29. `String.prototype.toLocaleUpperCase()`
       返回本地主机语言环境把字符串转换为大小写格式字符串
 
 
-
+## RegExp 对象
+见文档[regular-expressions-learningnote](./regular-expressions-learningnote.md)
 
 
 
@@ -625,11 +648,11 @@
    ```
 
 3. 通用属性：
-   1. `name`错误名称，默认为`Error`
-   2. `message`错误信息
-   3. `stack`错误堆栈，记录错误的文件位置和行号等信息
-   4. `fileName`错误的文件位置
-   5. `lineNumber`错误的行号
+   1. `Error.prototype.name`错误名称，默认为`Error`
+   2. `Error.prototype.message`错误信息
+   3. `Error.prototype.stack`错误堆栈，记录错误的文件位置和行号等信息
+   4. `Error.prototype.fileName`错误的文件位置
+   5. `Error.prototype.lineNumber`错误的行号
 
 
 ## Math 对象
@@ -657,11 +680,6 @@
    10. `Math.sqrt(x)`返回数字x的平方
    11. `Math.cbrt(x)`返回数字x的立方
    12. 正反三角函数，对数......查文档补充
-   13. ``
-   14. ``
-   15. ``
-   16. ``
-   17. ``
 
 
 
@@ -696,7 +714,7 @@
    
    3. `Object.prototype[Symbol.isConcatSpreadable]`布尔值，定义对象被`Array.prototype.concat()`作为参数调用时时是否可以展开
    
-   4. `Object.prototype[Symbol.species]`getter函数属性，函数返回值定义其衍生对象的父类，在如`Array.prototype.map()`等方法返回默认构造函数时调用，一般为类下的静态getter方法
+   4. `Object[Symbol.species]`getter函数属性，函数返回值定义其衍生对象的父类，在如`Array.prototype.map()`等方法返回默认构造函数时调用，一般为类下的静态getter方法
    
    5. `RegExp.prototype[Symbol.match]`函数属性，当正则对象作为`String.prototype.match()`方法的参数调用时执行次函数，将调用方法的字符串实例作为此方法的第一个实参，返回值作为结果
 
@@ -779,7 +797,7 @@
 
 
 3. 原生的可迭代对象相关方法
-   1. `Array|TypedArray|String|Map|Set.prototype[Symbol.iterator]()`
+   1. `Array|TypedArray|String|Map|`Set.prototype[Symbol.iterator]()``
       返回包含键值的迭代器
       >注意：此方法要调用后获取返回值为迭代器，不是属性
 
@@ -964,9 +982,133 @@
 
 ## Set 对象
 
+特点：不能放同样的数据（NaN为一个值，内容相同的对象为不同的值）
+
+1. 构造函数
+   ```js
+   new Set(iterable)
+   ```
+   可以放入一个可迭代对象，构造函数会将可迭代对象的所有值都压入新的set实例对象
+
+2. 属性：
+   1. `Set.prototype.size`元素个数
+
+3. 方法：
+   1. `Set.prototype.add(value)`
+      向队尾添加一个指定值，返回本身实例对象
+      >可链式调用
+
+   2. `Set.prototype.clear()`
+      清空对象中的所有元素
+
+   3. `Set.prototype.delete(value)`
+      删除指定的元素，返回布尔值，表示是否删除成功
+
+   4. `Set.prototype.forEach(callback(currentValue,currentKey,set),thisArg)`
+      根据元素插入顺序，对每一项执行回调函数，并返回undefined
+      thisArg为回调中this的指向
+      >set对象没有索引，所以currentValue和currentKey相同
+
+   5. `Set.prototype.has(value)`
+      返回一个布尔值表示对象中是否有对应值的元素
+
+   6. `Set.prototype.entries()`
+      返回value值为元素`[value,value]`的迭代器对象，迭代顺序为元素插入顺序
+
+   7. `Set.prototype.values()`、`Set.prototype.keys()`
+      返回value值为每个元素的迭代器对象，迭代顺序为元素插入顺序
+
+4. 技巧用法：
+   1. 数组去重：
+      ```js
+      [...new Set(array)]
+      ```
+
+   2. 字符串去重：
+      ```js
+      [...new Set('ababbc')].join('')
+      ```
+
+##  WeakSet对象
+特点：不能放相同的数据，且其中元素只能是对象类型，并且对数据弱引用
+弱引用：垃圾回收机制不考虑WeakSet对该对象的引用，如果其他对象都不再引用该对象，那么垃圾回收机制会自动回收该对象所占用的内存，不考虑该对象还存在于WeakSet之中
+>弱引用对象是不能遍历的，因为随时可能消失
+
+1. 方法：（Set中只有三个方法能调用）
+   1. `WeakSet.prototype.add(value)`
+   2. `WeakSet.prototype.delete(value)`
+   3. `WeakSet.prototype.has(value)`
 
 ## Map 对象
+对象中的键名只能是String类型或Symbol类型
+特点：可将任意值作为键名，且记住插入顺序
 
+1. 构造函数:
+   ```js
+   new Map([iterable])
+   ```
+   iterable为可迭代对象，其中的值为包含键名和键值的长度为2的数组，以数组为例
+   ```js
+   new Map([[1, 'one'],[2, 'two']])
+   ```
+
+
+2. 属性：
+
+   1. `Map.prototype.size`成员数量
+
+
+2. 方法：
+
+
+   1. `Map.prototype.set(key, value)`
+      添加新成员，返回Map实例对象
+   
+   2. `Map.prototype.get(key)`
+      返回对应key成员的value值，找不到返回undefined
+
+   3. `Map.prototype.has(key)`
+      返回布尔值，表示是否存在对应key的成员
+
+   5. `Map.prototype.delete(key)`
+      移除 Map 对象中指定的元素，返回布尔值表示成功或失败
+
+   4. `Map.prototype.clear()`
+      移除 Map 对象中的所有元素，返回undefined
+
+   6. `Map.prototype.forEach(callback(currentValue,currentKey,map),thisArg)`
+      根据元素插入顺序，对每一项执行回调函数，并返回undefined
+      thisArg为回调中this的指向
+
+   7. `Map.prototype.keys()`
+      返回value值为元素key的迭代器对象，迭代顺序为元素插入顺序
+
+   8. `Map.prototype.values()`
+      返回value值为元素value的迭代器对象，迭代顺序为元素插入顺序
+
+   9. `Map.prototype.entries()`
+      返回value值为元素`[key, value]`的迭代器对象，迭代顺序为元素插入顺序
+
+
+
+
+## WeakMap 对象
+特点：键名必须为对象，对键名进行弱引用，而键值为正常引用
+用途：dom节点作为键名
+
+1. 方法
+
+   1. `WeakMap.prototype.set(key, value)`
+      添加新成员，返回WeakMap实例对象
+
+   2. `WeakMap.prototype.get(key)`
+      返回对应key成员的value值，找不到返回undefined
+
+   3. `WeakMap.prototype.has(key)`
+      返回布尔值，表示是否存在对应key的成员
+
+   4. `WeakMap.prototype.delete(key)`
+      移除WeakMap对象中指定的元素，返回布尔值表示成功或失败
 
 
 
@@ -983,5 +1125,5 @@
 
 ## 扩展
 
-
+WeakRef（ES2021）、FinalizationRegistry（ES2021）
 

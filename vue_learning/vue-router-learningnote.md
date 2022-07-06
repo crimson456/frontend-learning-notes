@@ -2,7 +2,7 @@
 
 ### 一.基本使用和配置对象
 
-1. 安装vue-router，命令：```npm i vue-router```   
+1. 安装vue-router，命令：`npm i vue-routers`   
 
 
 2. 在主文件中应用插件且注册对应的路由器实例对象
