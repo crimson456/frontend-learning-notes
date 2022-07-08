@@ -469,10 +469,13 @@ normalize()
 
    1. `getAttribute(attributeName)`
       获取属性值
+      
    2. `setAttribute(attributeName, value)`
       设置或更改属性值
+
    3. `hasAttribute(attributeName)`
       返回是否有属性的布尔值
+      
    4. `removeAttribute(attributeName)`
       移除属性
 

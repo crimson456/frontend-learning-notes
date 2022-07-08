@@ -1,7 +1,8 @@
 # Promise Learning
 
-## 一.promise的封装
-1. 把一个方法封装成promise对象（以nodejs内置readFile为例）
+## Promise的封装
+
+1. 把一个方法封装成Promise对象（以nodejs内置readFile为例）
 
     ```js
     function promisifyreadfile(path) {
@@ -24,78 +25,157 @@
     ```
 
 ## Promise 对象
-1. 属性
-    1. PromiseState
 
-    2. PromiseResult
+1. 构造函数
+    ```js
+    let executor = (resolve,reject)=>{
+        //异步操作
+        if(/*操作成功*/) {
+            resolve(value)
+        } else {
+            //操作失败
+            reject(errMessage)
+        }
+    }
+    new Promise(executor)
+    ```
+    Promise对象接收一个处理器函数(executor function)作为参数  
+    `value`为成功时传递的数据，errMessage为失败时传递的错误信息，传给对象下的`then()`和`catch()`方法
 
-2. 构造对象下的方法
-    1. ``
-    2. ``
-    3. ``
-    4. ``
-    5. ``
-    6. ``
+2. 实例属性
 
-3. 实例对象下的方法
-    1. ``
-    2. ``
-    3. ``
-    4. ``
+    1. `[[PromiseState]]`Promise实例的状态:  
+        待定（pending）: 初始状态，既没有被兑现，也没有被拒绝  
+        已兑现（fulfilled/resolved）: 意味着操作成功完成  
+        已拒绝（rejected）: 意味着操作失败  
+        >状态转换只能从`pending`到`fulfilled`或者`rejected`
 
+    2. `[[PromiseResult]]`Promise实例对象处理器函数中调用`resolve()`或`reject()`传入的值
 
+3. 构造对象下的方法
 
-
-## 二.promise实例的属性
-一个promise实例下有两个属性`PromiseState`和`PromiseResult`  
-1.promise实例必然处于以下几种状态之一：  
-待定（pending）: 初始状态，既没有被兑现，也没有被拒绝  
-已兑现（fulfilled/resolved）: 意味着操作成功完成  
-已拒绝（rejected）: 意味着操作失败  
-并且状态转换只能从`pending`到`fulfilled`(通过调用`resolve()`)或者`rejected`(通过调用`reject()`)  
-2.promise的结果为调用`resolve()`或者`reject()`传入的参数  
-
-## 三.Promise的静态方法  
-在Promise对象下有几个静态方法：  
-0.构造函数：  
-将处理器函数(executor function)`(resolve,reject)=>{}`作为参数  
-异步任务顺利完成调用`resolve(value)`,  
-异步任务失败调用`reject(value)`,  
-`value`为成功时得到的数据，或者失败时的错误信息(会传给后面调用的`then()`和`catch()`方法)
-
-1.`Promise.resolve(value)`:  
-如果`value`为非promise对象，返回一个状态为`fulfilled`结果为`value`的promise对象，  
-如果`value`为promise对象，直接返回`value`
-
-2.`Promise.reject(reason)`:  
-返回一个状态为`rejected`结果为`reason`的promise对象  
-
-3.`Promise.all([p1,p2,p3])`  //(举例为三个，可为多个)  
-可以接收多个promise对象作为参数(也可以不为promise对象，详见[官方文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/all))  
-如果`p1,p2,p3`状态都为`fufilled`，则返回一个状态为`fufilled`，结果为`[p1.PromiseResult,p2.PromiseResult,p3.PromiseResult]`数组的promise对象  
-如果任意一个参数数组中的promise对象状态为`rejected`，则返回该对象  
-如果`p1,p2,p3`中有异步对象，则会先返回一个状态为`pending`的promise对象，待异步对象执行完毕后更新  
-
-4.`Promise.race([p1,p2,p3])`  //(举例为三个，可为多个)  
-返回第一个改变状态(`fufilled`或`rejected`)的promise对象
+    1. `Promise.resolve(value)`
+        返回一个Promise对象，
+        如果`value`为Prmise对象，返回此Promise对象
+        如果`value`为thenable对象(对象下具有`then(resolve,reject)`方法)，返回的Promise跟随此方法的then方法的最终状态？？
+        >判断是否为thenable对象只需要对象下有`then()`方法
+        如果`value`为其他值，则返回的Promise对象以`value`为值，`fulfilled`为状态
+        如果`value`不存在，则直接返回一个`fulfilled`状态的 Promise 对象。
 
 
-## 四.promise的实例方法
-1.`then((value)=>{},(reason)=>{})`  
-调用实例对象的`then()`会根据实例对象处理器函数中的`resolve()`和`reject()`函数的调用情况来选择执行调用函数：  
-如果实例对象中调用`resolve()`，则执行第一个参数的函数，如果实例对象中调用`reject()`，则执行第二个参数的函数
-`then()`函数本身会返回一个promise对象，对象的状态和结果由两个参数函数决定：  
-如果实例对象中调用`resolve()`，则由第一个参数函数决定，如果实例对象中调用`reject()`，则由第二个参数函数决定  
-两个参数函数中都有以下几种情况：(具体参见mdn文档)  
-①`throw '错误信息'`抛出异常，返回一个状态为`rejected`结果为`错误信息`的promise对象  
-②如果参数函数中返回非promise对象，则返回一个状态为`fulfilled`结果为`返回值`的promise对象  
-③如果参数函数中返回promise对象，则返回这个promise对象
+    2. `Promise.reject(reason)`
+        返回一个状态为`rejected`结果为`reason`的promise对象  
+        >reason值会原封不动地传给`then()`和`catch()`
 
-2.`catch((value)=>{})`  
-可用作`then((undefined,(value)=>{})`
+    3. `Promise.all(iterable)`(全成功则成功，有失败则失败)
+        接收一个可迭代对象且对象的每个成员都是Promise对象，如果不是，则调用`Promise.resolve()`方法处理为Promise对象并返回一个Promise对象
+        如果所有成员都为`fufilled`状态的Promise对象，则返回状态为`fufilled`，结果为可迭代对象成员的结果组成的数组的Promise对象
+        如果其中任意成员为`rejected`状态的Promise对象，则返回状态为`rejected`，结果为第一个状态为`rejected`的Promise对象的
+        如果其中有成员为`pending`状态的Promise对象，则返回状态为`pending`的Promise对象，并等待成员的状态改变，如果任意成员的状态改变为`rejected`，则返回的Promise对象状态也立即改变为`rejected`，值为此成员的结果，如果所有成员都改变为`fufilled`状态，则返回的Promise对象状态也立即改变为`fufilled`，结果为可迭代对象成员的结果组成的数组
+
+    4. `Promise.race(iterable)`(获取第一个改变状态的Promise)
+        接收一个可迭代对象且对象的每个成员都是Promise对象，如果不是，则调用`Promise.resolve()`方法处理为Promise对象并返回一个Promise对象
+        如果所有成员都为`pending`状态的Promise对象，则返回状态为`pending`的Promise对象，当任意成员状态发生改变时，返回的Promise对象立即改变为和此成员相同的状态和结果
+        如果存在成员不为`pending`状态，则返回迭代对象找到的第一个不`pending`状态的Promise对象？？？
+
+
+
+
+
+    5. `Promise.allSettled(iterable)`(ES2020)(所有Promise完成后执行)
+        接收一个可迭代对象且对象的每个成员都是Promise对象，如果不是，则调用`Promise.resolve()`方法处理为Promise对象并返回一个状态为`pending`的Promise对象
+        当所有成员的状态都发生改变后，返回的Promise对象状态变为`fufilled`，结果为一个包含所有成员状态和结果的数组
+
+
+    6. `Promise.any(iterable)`(ES2021)（获取第一个状态改变为成功的Promise）
+        接收一个可迭代对象且对象的每个成员都是Promise对象，如果不是，则调用`Promise.resolve()`方法处理为Promise对象并返回一个Promise对象
+        任何一个成员变成成功`fufilled`状态，或者所有Promise都失败，那么返回的Promise变成成功失败状态？？？
+
+
+
+
+
+
+
+
+4. 实例对象下的方法
+    1. `Promise.prototype.then(resolve,reject)`
+        注意：`then()`方法返回一个Promise对象，此Promise对象根据`then()`中两个回调函数参数的返回值而定
+        如果函数参数中返回Promise对象，则`then()`方法返回的Promise对象和此对象状态结果都相同
+        如果函数参数中返回普通值，则`then()`方法返回的Promise对象状态为`fufilled`，结果为此普通值
+        如果函数参数中无返回值，则`then()`方法返回的Promise对象状态为`fufilled`，结果为undefined
+        如果函数参数中抛出错误，则`then()`方法返回的Promise对象状态为`rejected`，结果为抛出的错误
+        
+
+    2. `Promise.prototype.catch(reject)`
+        可用作`then((undefined,(value)=>{})`
+
+    3. `Promise.prototype.finally(callback)`(ES2018)
+        回调函数中无参数，相当于不管Promise的状态变化为哪种，都要执行
+        ```js
+        promise
+        .finally(() => {
+          // 语句
+        });
+
+        // 等同于
+        promise.then(result => {
+                  // 语句
+                  return result;
+                },
+                error => {
+                  // 语句
+                  throw error;
+                }
+        );
+        ```
+
+
+
+
+
+
+
+
+
+
+## 宏任务、微任务和任务调度
+
+微任务优先级高于宏任务
+
+1. 宏任务：
+    - script(整体代码)
+    - setTimeout
+    - setInterval
+    - I/O
+    - UI交互事件
+    - postMessage
+    - MessageChannel
+    - setImmediate(Node.js 环境)
+
+2. 微任务：
+    - Promise.then
+    - Object.observe
+    - MutationObserver
+    - process.nextTick(Node.js 环境)
+
+3. 任务循环：
+
+    任务循环中，每一次循环称为tick，每一次tick的任务如下：
+    执行一个宏任务（栈中没有就从事件队列中获取）
+    执行过程中如果遇到微任务，就将它添加到微任务的任务队列中
+    宏任务执行完毕后，立即执行当前微任务队列中的所有微任务（依次执行）
+    当前宏任务执行完毕，开始检查渲染，然后GUI线程接管渲染
+    渲染完毕后，JS线程继续接管，开始下一个宏任务（从事件队列中获取）
+
+4. 扩展：
+    调用`setTimeout()`定时器时，计时器在计时结束后回调函数作为任务压入宏任务队列，等待调用，所以如果前面程序的运行时间过长可能会影响定时器的回调调用时机
+
+
+
 
 ## 五.promise的自封装
-简易的自封装promise见文件[mypromise.js](mypromise.js)   
+简易的自封装promise见文件[mypromise.js](mypromise-1.js)   
 
 
 

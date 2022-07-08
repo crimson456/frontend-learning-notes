@@ -35,18 +35,12 @@
     <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
     <script>
-        let obj = {
-            //普通属性
-            a: 10,
-            //访问器属性
-            get b() {
-                return 20
-            },
-            set b(value) {
-                return value
-            }
-        }
-        console.log(obj);
+        let t1 = setTimeout(() => {
+            console.log('t1');
+        }, 2000);
+        let t2 = setTimeout(() => {
+            console.log('t2');
+        }, 1000);
     </script>
     </body>
 
