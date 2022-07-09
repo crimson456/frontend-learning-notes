@@ -129,7 +129,7 @@
    2. 定义成员相关：
 
       1. `Object.defineProperty(p1,p2,p3)`  
-         为目标对象 p1 定义属性并作为返回值，p2 为属性名，p3 为属性描述对象
+         为目标对象 p1 定义或修改属性并作为返回值，p2 为属性名，p3 为属性描述对象
 
          ```js
          const object1 = {};
@@ -140,7 +140,7 @@
          ```
 
       2. `Object.defineProperties(p1,p2)`  
-         为目标对象 p1 定义多个属性并作为返回值，p2 为以属性名和属性描述对象为键值对的对象形式
+         为目标对象 p1 定义或修改多个属性并作为返回值，p2 为以属性名和属性描述对象为键值对的对象形式
 
          ```js
          const object1 = {};
@@ -1148,9 +1148,180 @@
 
 ## Proxy 对象
 
+1. 构造函数
+   ```js
+   new Proxy(target, handler)
+   ```
+   target为目标对象，handler为拦截器函数(traps)组成的对象
+
+   Proxy实例可以挂在某个对象的原型上(目标对象的原型上)猜测？？
+
+
+2. 13个拦截器函数(traps)：
+
+   >注意：traps函数中this指向handler对象
+
+   1. `get(target, propKey, receiver)`
+      拦截对象属性(包括原型链上的)的读取，比如proxy.foo和proxy['foo']
+      - target 目标对象
+      - propKey 取值操作的属性名
+      - receiver 一般情况下是proxy实例本身，原始操作行为所在的对象(如果proxy实例挂载在某对象上，则为此对象的引用)
+      - 返回值：任意值，作为读取操作获得的值
+      >约束：
+      >1. 如果一个属性不可配置（configurable）且不可写（writable），则返回的值必须与该目标属性的值相同
+      >2. 如果要访问的目标属性没有配置访问方法，即 get 方法是 undefined 的，则返回值必须为 undefined
+
+   2. `set(target, propKey, value, receiver)`
+      拦截对象属性(包括原型链上的)的设置，比如proxy.foo = v或proxy['foo'] = v
+      - target 目标对象
+      - propKey 赋值操作的属性名
+      - value  赋值操作的值
+      - receiver 一般情况下是proxy实例本身
+      - 返回值：布尔值，表示设置成功或失败
+      >约束：
+      >1. 如果目标对象的某个属性不可写及不可配置，则不能改变它的值
+      >2. 如果目标属性没有配置存储方法，即 `[[Set]]` 属性的是 undefined，则不能设置它的值
+      >3. 严格模式下返回false或undefined抛出TypeError
+
+   3. `apply(target, thisArg, argumentsList)`
+      拦截 Proxy 实例作为函数调用的操作，比如proxy(...args)、proxy.call(object, ...args)、proxy.apply(...)
+      - target 目标对象
+      - thisArg 目标对象的上下文对象（this）
+      - argumentsList 目标对象的参数数组
+      - 返回值：任意值，作为拦截的函数调用操作的结果
+      >约束：
+      >1. 目标对象必须为函数
+
+   4. `has(target, propKey)`
+      拦截`propKey in proxy`的操作
+      - target 目标对象
+      - propKey 需要检查是否存在的属性名
+      - 返回值：布尔值，表示存在或不存在
+      >约束：
+      >1. `has()`不判断一个属性是对象自身的属性，还是继承的属性
+      >2. 原对象不可配置或者禁止扩展，这时has()拦截会报错
+
+   5. `deleteProperty(target, propKey)`
+      拦截`delete proxy[propKey]`的操作
+      - target 目标对象
+      - propKey  需要删除的属性名
+      - 返回值：布尔值，表示成功或失败
+      >约束：
+      >1. 目标属性为不可配置，则无法删除
+      
+   6. `ownKeys(target)`
+      拦截对对象自身属性的读取操作，如`Object.getOwnPropertyNames()`、`Object.getOwnPropertySymbols()`、`Object.keys()`、`for/in`
+      - target 目标对象
+      - 返回值:数组，代表拦截的读取操作的方法能够读取的属性的键名(目标对象上不存在的属性、属性名为Symbol值、不可枚举的属性会被自动过滤)
+      >约束：
+      >1. 返回的值必须为数组，且数组成员必须是String类型或Symbol类型
+      >2. 结果列表必须包含目标对象所有不可配置的自有属性的 key
+      >3. 如果目标对象不可扩展，那么结果列表必须包含目标对象的所有自有属性的 key，不能有其它值
+      ？？
+
+   7. `construct(target,argumentsList,newTarget)`
+      拦截 Proxy 实例作为构造函数调用的操作，如`new proxy(...argumentsList)`
+      - target 目标对象
+      - argumentsList 构造函数的实参列表
+      - newTarget 创造实例对象时，new命令作用的构造函数
+      - 返回值：对象，作为构造函数调用的结果
+      >约束：
+      >1. 返回值必须为对象
+
+   8.  `getOwnPropertyDescriptor(target, propKey)`
+      拦截`Object.getOwnPropertyDescriptor()`
+      - target 目标对象
+      - propKey 要获取属性描述符的属性名
+      - 返回值：对象或undefined，作为方法返回的属性描述对象
+      >约束：
+      >1. 必须返回一个 object 或 undefined
+      >2. 如果属性不可配置，则无法报告为不存在
+      >3. 如果目标对象不可扩展，则该属性无法报告为不存在
+      >4. 如果属性不存在，且目标对象不可扩展，则不能将其报告为存在
+      >5. 如果属性作为目标对象的自身属性存在，或者作为目标对象的可配置的属性存在，则不能被报告为不可配置
+     
+
+   9. `defineProperty(target, propKey, descriptor)`
+      拦截属性定义或修改操作，如`Object.defineProperty()`、`Object.defineProperties()`、`proxy.property='value'`
+      - target 目标对象
+      - propKey 要定义的属性名
+      - descriptor 要定义对象的属性描述符
+      - 返回值：布尔值，表示成功或失败
+      >约束：
+      >1. 如果目标对象不可扩展，则不能增加目标对象上不存在的属性
+      >2. 如果目标对象的某个属性不可写或不可配置，则不得改变这两个设置
+      >3. 在严格模式下，返回false会抛出TypeError
 
 
 
+   10. `preventExtensions(target)`
+      拦截`Object.preventExtensions(proxy)`
+      - target 目标对象
+      - 返回值：布尔值,表示目标对象是否进行了禁止扩展（不会实际更改，需要在处理函数内处理）
+      >约束：
+      >1. 如果目标对象是可扩展的，那么只能返回 false
+
+   11. `getPrototypeOf(target)`
+      拦截读取原型对象的操作，如`Object.getPrototypeOf(proxy)`、`__proto__`、`Object.prototype.isPrototypeOf()`、`instanceof`
+      - target 目标对象
+      - 返回值：对象，作为读取原型对象操作的结果
+      >约束：
+      >1. 返回值必须是对象或者null
+      >2. 如果目标对象是不可扩展的，则返回的对象必须是目标对象本身的原型
+
+   12. `isExtensible(target)`
+      拦截`Object.isExtensible(proxy)`
+      - target 目标对象
+      - 返回值：布尔值,表示目标对象是否可以扩展（不会实际更改，需要在处理函数内处理）
+      >约束：
+      >1. `Object.isExtensible(proxy)`必须同`Object.isExtensible(target)`返回相同值
+
+
+
+   13. `setPrototypeOf(target, proto)`
+      拦截`Object.setPrototypeOf(proxy, proto)`，返回一个布尔值
+      - target 目标对象
+      - proto 要设置的原型对象
+      - 返回值：布尔值,表示设置成功或失败
+      约束：
+      1. 如果目标对象不可扩展，则原型设置的原型必须和原本相同
+
+
+3. 可撤销的代理
+
+   `Proxy.revocable(target, handler)`
+   返回一个对象，对象下包括一个可撤销的代理对象，和撤销代理对象的方法，eg.
+   ```js
+   let target = {};
+   let handler = {};
+
+   let {proxy, revoke} = Proxy.revocable(target, handler);
+
+   proxy.foo = 123;
+   proxy.foo // 123
+
+   revoke();
+   proxy.foo // TypeError: Revoked
+   ```
+
+## Reflect 对象
+
+   Reflect对象下有13个方法及其参数与Proxy一一对应，可以放在对应Proxy构造函数的traps函数中作默认操作(一般和Proxy配合使用)
+   此13个方法有些和原本对象上的方法相同(进行了一些合理改变)，有些将命令转变为函数的形式
+   
+   1. `Reflect.apply(target, thisArg, args)`
+   2. `Reflect.construct(target, args)`
+   3. `Reflect.get(target, name, receiver)`
+   4. `Reflect.set(target, name, value, receiver)`
+   5. `Reflect.defineProperty(target, name, desc)`
+   6. `Reflect.deleteProperty(target, name)`
+   7. `Reflect.has(target, name)`
+   8. `Reflect.ownKeys(target)`
+   9.  `Reflect.isExtensible(target)`
+   10. `Reflect.preventExtensions(target)`
+   11. `Reflect.getOwnPropertyDescriptor(target, name)`
+   12. `Reflect.getPrototypeOf(target)`
+   13. `Reflect.setPrototypeOf(target, prototype)`
 
 
 
