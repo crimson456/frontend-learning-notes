@@ -548,7 +548,7 @@ normalize()
 
    > 区别：
    >
-   > 1. addEventListener 可以定义多个事件处理函数按定义顺序执行，但是多次注册相同 的事件处理函数只会执行一次，而 attachEvent 会调用和定义次数相同的次数
+   > 1. addEventListener 可以定义多个事件处理函数按定义顺序执行，但是多次注册相同的事件处理函数只会执行一次，而 attachEvent 会调用和定义次数相同的次数
    > 2. 前两种事件处理函数中 this 指向事件目标，而 attachEvent 指向 window 对象
 
 2. 事件对象Event下的属性和方法
