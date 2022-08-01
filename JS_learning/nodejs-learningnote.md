@@ -5,77 +5,204 @@ nodejs中事件用`on()`方法监听
 
 ## http 模块
 
-const http = require('http')
 
-http 模块下的方法:
+1. http 模块下的属性和方法:
 
-1. `http.createServer([options][, requestListener])`
-   返回一个 http.Server 对象
-   requestListener为Server对象下监听请求事件的处理函数(可在后续Server对象上写监听函数)
+   1. `http.METHODS` http请求方式数组，包括GET,POST
+   2. `http.STATUS_CODES` http状态码对象，以状态码为键名，状态字为键值组成的对象
 
-2. ``
+   3. `http.globalAgent` Agent的全局实例，作为所有HTTP客户端请求的默认Agent ？
+   4. `http.maxHeaderSize` 只读属性，指定http头部最大字节数，默认16KB
 
-http 模块下的类：
+   5. `http.createServer([options][, requestListener])`
+      返回一个 http.Server 类实例
+      requestListener为Server对象下request事件处理函数
 
-1. `http.Server`
+   6. `http.request(url[,options][,callback])`、
+      `http.request(options[,callback])`、
+      `http.get(options[,callback])`、
+      `http.get(url[,options][,callback])`
+      返回http.ClientRequest类的实例对象，用于发起http请求
 
-   1. 事件：
-      - request 事件，参数 request，response，分别为 http.IncomingMessage、http.ServerResponse 类
-      -
-   2. 方法：
-      - listen()监听端口
+   7. `http.validateHeaderName(name)` 验证对应请求头是否可用，不可用则抛出错误(在`res.setHeader()`底层使用)
+   8. `http.validateHeaderValue(name, value)` 验证请求头的对应值是否可用，不可用则抛出错误(在`res.setHeader()`底层使用)
 
+2. http 模块下的类：
 
+   1. `http.Server`类(由`http.createServer()`创建)(继承自`net.Server`类)
+      1. 事件：
+         - `request` 接收到请求时触发
+            - req http.IncomingMessage类实例
+            - res http.ServerResponse类实例
+         - `checkContinue` 接收到带有`Expect:100-continue`请求头的http请求时触发
+            - req http.IncomingMessage类实例
+            - res http.ServerResponse类实例
+         - `checkExpectation` 接收到带有`Expect:xxx`(xxx不为100-continue)请求头的http请求时触发
+            - req http.IncomingMessage类实例
+            - res http.ServerResponse类实例
+         - `clientError` 客户端触发的error事件时会触发
+           - err 
+           - socket net.Socket类
+         - `connection` 新的TCP流被建立时触发
+           - socket net.Socket类
+         - `connect` 接收到CONNECT请求时触发
+           - req http.IncomingMessage类实例
+           - socket net.Socket类实例
+           - head 流的第一个数据包?
+         - `upgrade` 客户端发送 HTTP upgrade 请求时触发
+           - req http.IncomingMessage类实例
+           - socket net.Socket类实例
+           - head 流的第一个数据包?
+         - `close` 服务器关闭触发
+         - `dropRequest` 请求数量达到`server.maxRequestsPerSocket`时触发，并返回503状态码
 
-2. `http.IncomingMessage`(req)
-   1. 属性：
-      - url 请求的网址字符串
-      - 
-   2. 事件：
-      - data (继承自流) 回调参数:chunk(数据块，拼接后得到完整数据)
-      - end (继承自流)  数据传输结束后调用
-
-3. `http.ServerResponse`(res)
-   1. 方法：
-      - `response.write(chunk[, encoding][, callback])`
-        可多次调用，发送响应正文
-        >encoding：chunk的编码方式,默认utf8
-        >callback:刷新数据块时将调用
-      - `response.writeHead(statusCode[, statusMessage][, headers])`
-        添加多个响应头和响应状态码
-        >statusCode:http状态码
-        >statusMessage：状态信息，如‘ok’
-        >headers：响应头JSON对象形式
-      - `response.setHeader(key, value)`
-        设置响应头的单个属性
-        >`writeHead()`方法优先级更高
-      - `response.end([data[, encoding]][, callback])`
-        发送响应正文(用法同`write()`方法)，并结束这次请求
-      - 
-
-
-
-
-4. 发送请求
-  `http.request(url[,options][,callback])`
-  `http.request(options[,callback])`
-  `http.get(options[,callback])`
-  `http.get(url[,options][,callback])`
-  返回http.ClientRequest类的实例对象，用于请求数据
-
-
-
-
-
-
-
-
-
+      2. 属性、方法：
+         - `server.timeout` socket的超时时间(毫秒)，设置为0表示不会超时
+         - `server.headersTimeout` 等待接收完整http头的时间，超出返回408
+         - `server.requestTimeout` 接收完整请求的超时时间，超出返回408
+         - `server.listening` 布尔值，是否正在监听连接
+         - `server.maxHeadersCount` 限制最大请求头数，默认2000
+         - `server.maxRequestsPerSocket` 每个socket最多请求数
+         - `server.keepAliveTimeout` 长连接的超时时间
+         - `server.listen()` 监听端口，......,同net.Server类中相同
+         - `server.setTimeout([msecs][, callback])` 设置socket的超时时间
+         - `server.close([callback])` 停止接收新的连接
+         - `server.closeAllConnections()` 关闭所有连接
+         - `server.closeIdleConnections()` 关闭没有发送请求或等待响应的连接
 
 
+   2. `http.IncomingMessage`(req，在`http.Server`实例事件回调中使用)
+      继承自`stream.Readable`类
+      1. 事件:
+         - `close` 请求完成时触发
+         - `data` (继承) 
+           - chunk 数据块，拼接后得到完整数据
+         - `end` (继承)  数据传输结束后调用
+
+      2. 属性、方法：
+         - `message.url` 请求方要求的资源地址(包括请求参数)
+         - `message.method` http请求方式
+         - `message.statusCode` 状态码
+         - `message.statusMessage` 状态信息
+         - `message.httpVersion` http版本
+         - `message.complete` 布尔值，完整http信息被接收和解析后为真(流上的end事件触发后为真)
+         - `message.headers` 请求头或响应头，对象形式，值处理
+         - `message.headersDistinct` 请求头或响应头，对象形式，值不处理为数组形式
+         - `message.rawHeaders` 请求头或响应头，数组形式
+         - `message.trailers` trailer字段，对象形式，值处理
+         - `message.trailersDistinct` trailer字段，对象形式，值不处理为数组形式
+         - `message.rawTrailers` trailer字段，数组形式
+         - `message.socket` 底层socket对象
+         - `message.destroy([error])` 调用socket上的destroy()方法
+         - `message.setTimeout(msecs[, callback])` 调用socket上的setTimeout()方法
+
+
+   3. `http.ServerResponse`(res，在`http.Server`实例事件回调中使用)
+      继承自`http.OutgoingMessage`类(可读流)
+      1. 事件:
+         - `finish` 响应发送前(响应头和正文都交给底层系统)触发
+         - `close` 响应完成或底层连接断开触发
+         >`response.end()`方法调用后两个事件都会触发，顺序为先`finish`后`close`
+
+      2. 方法：
+         - `response.writeHead(statusCode[, statusMessage][, headers])`添加多个响应头和响应状态码
+           >`writeHead()`方法优先级最高
+         - `response.statusCode` 响应状态码
+         - `response.statusMessage` 响应状态信息
+         - `response.sendDate` 布尔值，表示响应头中是否包含日期字段
+         - `response.req` 引用请求对象
+         - `response.writeContinue()` 发送HTTP/1.1 100 Continue消息到客户端，表示请求主体可以开始发送
+            >可在服务器`checkContinue`事件触发的回调中调用
+         - `response.writeProcessing()` 发送HTTP/1.1 102 Processing消息到客户端，表示请求主体可以开始发送
 
 
 
+   4. `http.ClientRequest`类(由`http.request()`、`http.get()`创建)
+      继承自`http.OutgoingMessage`类(可写流)
+      1. 事件:
+         
+         - `close` 请求完成或底层连接断开触发
+         - `connect` 服务器响应CONNECT请求时触发
+           - req http.IncomingMessage类实例
+           - socket net.Socket类实例
+           - head 流的第一个数据包?
+         - `continue` 服务器发送100 Continue响应时触发
+         - `finish` 请求被发送时触发
+         - `information` 服务器发送1xx(除101 Upgrade)响应时触发
+           - info 信息对象
+         - `response`
+           - res http.IncomingMessage类实例
+         - `socket` socket被分配到请求时触发 ？
+           - socket net.Socket类实例
+         - `timeout` 底层 socket 超时的时候触发
+         - `upgrade` 服务器发送101 Upgrade响应时触发 ？
+
+      2. 属性、方法：
+
+         - `request.path` 请求的文件路径
+         - `request.method` 请求的方法
+         - `request.host` 请求的主机
+         - `request.protocol` 请求的协议
+         - `request.maxHeadersCount` 设置最大响应头数量
+         - `request.reusedSocket` 布尔值，表示请求是否通过一个重用的socket
+         - `request.setNoDelay([noDelay])` 调用socket上的setNoDelay方法(Nagle算法相关)
+         - `request.setSocketKeepAlive([enable][, initialDelay])` 调用socket上的setKeepAlive方法(是否禁用长连接)
+
+
+
+
+
+
+   5. `http.OutgoingMessage`类
+      继承自`stream.Writable`类(实际是继承`Stream`类)
+      1. 事件
+         - `drain`
+         - `finish`
+         - `prefinish`
+      2. 属性、方法
+
+         - `outgoingMessage.write(chunk[, encoding][, callback])` 可多次调用，写入正文
+           >callback:刷新数据块时将调用 ？
+         - `outgoingMessage.end([data[, encoding]][, callback])` 写入正文，并结束响应正文
+         - `outgoingMessage.setHeader(name, value)` 设置响应头对应字段的值，会覆盖
+         - `outgoingMessage.appendHeader(name, value)` 添加响应头对应字段的值
+         - `outgoingMessage.removeHeader(name)` 移除响应头对应字段
+         - `outgoingMessage.getHeaders()` 返回响应头对象的浅拷贝，且此对象不继承object对象
+         - `outgoingMessage.getHeaderNames()` 返回响应头字段名字的数组
+         - `outgoingMessage.getHeader(name)` 返回对应响应头名字的值
+         - `outgoingMessage.hasHeader(name)` 返回布尔值，判断响应头是否有对应字段
+         - `outgoingMessage.headersSent` 布尔值，表示响应头是否已经发送
+         - `outgoingMessage.flushHeaders()` 刷新请求头 ？
+         - `outgoingMessage.addTrailers(headers)` 添加尾部响应头
+            >发送尾部响应头之前，需先在响应头Trailer字段中添加尾部响应头的名字列表
+         - `outgoingMessage.writableEnded` 布尔值，`outgoingMessage.end()`方法调用后为真
+         - `outgoingMessage.writableFinished` 布尔值，所有数据被传入底层系统后为真(finish事件触发前)
+         - `outgoingMessage.cork()` 从流中继承
+         - `outgoingMessage.uncork()` 从流中继承
+         - `outgoingMessage.socket` 引用底层socket
+         - `outgoingMessage.setTimeout(msecs[, callback])` 设置socket的超时事件
+         - `outgoingMessage.destroy([error])` 调用socket上的destroy()方法
+         - `outgoingMessage.pipe()` 重写pipe方法，使调用时抛出错误(可读流不可调用pipe方法)
+         - `outgoingMessage.writableCorked` 继承自可写流
+         - `outgoingMessage.writableHighWaterMark` 继承自可写流
+         - `outgoingMessage.writableLength` 继承自可写流
+         - `outgoingMessage.writableObjectMode` 继承自可写流
+
+
+
+   6. `http.Agent`类  ？？？ (用于管理socket的长连接、复用，可在`http.request()`、`http.get()`配置项中使用)
+      new Agent([options])
+      agent.createConnection(options[, callback])
+      agent.keepSocketAlive(socket)
+      agent.reuseSocket(socket, request)
+      agent.destroy()
+      agent.freeSockets
+      agent.getName([options])
+      agent.maxFreeSockets
+      agent.maxSockets
+      agent.maxTotalSockets
+      agent.requests
+      agent.sockets
 
 
 
@@ -201,9 +328,6 @@ http 模块下的类：
 
 
 ## querystring 模块
-```js
-const querystring = require('node:querystring');
-```
 
 1. 模块下的方法：
    - `querystring.parse(str[, sep[, eq[, options]]])`
@@ -619,26 +743,35 @@ myEmitter.emit('event');
 
 3. 模块上的方法
 
-stream.finished(stream[, options], callback)
-stream.pipeline(source[, ...transforms], destination, callback)
-stream.pipeline(streams, callback)
-stream.compose(...streams)
-stream.Readable.from(iterable[, options])
-stream.Readable.fromWeb(readableStream[, options])
-stream.Readable.isDisturbed(stream)
-stream.isErrored(stream)
-stream.isReadable(stream)
-stream.Readable.toWeb(streamReadable)
-stream.Writable.fromWeb(writableStream[, options])
-stream.Writable.toWeb(streamWritable)
-stream.Duplex.from(src)
-stream.Duplex.fromWeb(pair[, options])
-stream.Duplex.toWeb(streamDuplex)
-stream.addAbortSignal(signal, stream)
+   stream.finished(stream[, options], callback)
+   stream.pipeline(source[, ...transforms], destination, callback)
+   stream.pipeline(streams, callback)
+   stream.compose(...streams)
+   stream.Readable.from(iterable[, options])
+   stream.Readable.fromWeb(readableStream[, options])
+   stream.Readable.isDisturbed(stream)
+   stream.isErrored(stream)
+   stream.isReadable(stream)
+   stream.Readable.toWeb(streamReadable)
+   stream.Writable.fromWeb(writableStream[, options])
+   stream.Writable.toWeb(streamWritable)
+   stream.Duplex.from(src)
+   stream.Duplex.fromWeb(pair[, options])
+   stream.Duplex.toWeb(streamDuplex)
+   stream.addAbortSignal(signal, stream)
 
+4. 双工流的类:`stream.Duplex`
+   - 继承自`stream.Readable`、`stream.Writable`
 
+5. 转换流的类:`stream.Transform `
+   - 继承自`stream.Readable`、`stream.Writable`
 
-
+6. 重写自己的流：
+   继承对应流的类，不同的流需要重写内部方法
+   - 可读流
+   - 可写流
+   - 双工流
+   - 转换流
 
 
 ## global 全局对象
@@ -940,10 +1073,28 @@ process.umask(mask)
 
 ## path 模块
 
+1. path模块下的属性
 
+   - `path.delimiter` 对应平台下的路径分隔符(Windows上是`;`,POSIX上是`:`)
+   - `path.sep` 路径片段分隔符(Windows上是`\`,POSIX上是`/`)
+   - `path.posix` 针对posix平台的path模块对象
+   - `path.win32` 针对window平台的path模块对象
 
+2. path模块下的方法
 
+   - `path.basename(path[, ext])` 返回文件不包括目录的文件名(如果提供扩展名则也不包括扩展名)
+   - `path.dirname(path)` 返回文件的目录名
+   - `path.extname(path)` 返回文件的扩展名(包括最后一个逗号之后的内容)
+   - `path.parse(path)` 将路径字符串转化成pathObject对象
+   - `path.format(pathObject)` 将pathObject对象转换成路径字符串
+   - `path.relative(from, to)` 返回两个路径之间的相对路径
+   - `path.isAbsolute(path)` 布尔值，判断是否为绝对路径
+   - `path.normalize(path)` 将路径规范化(处理多余的连续分隔符和将相对路径转化为绝对路径)
+   - `path.join([...paths])` 将路径片段合并
+   - `path.resolve([...paths])` 拼接出一个绝对路径，参数从右向左处理，直到拼接成一个绝对路径
+      >`/`根目录,`./`当前目录，`../`上一级目录
 
+   - `path.toNamespacedPath(path)` 从给定路径中找到等效的namespace-prefixed路径(仅Windows系统可用) ？
 
 
 ## module 模块
@@ -1074,19 +1225,137 @@ NODE_MODULES_PATHS(START)
 
 3. 类vm.Module、vm.SourceTextModule、vm.SyntheticModule相关？？？
 
-##
 
 
 
-##
+
+
+## net 模块
+用于tcp协议通信
+
+
+1. net模块下的方法：
+
+   - `net.createServer([options][, connectionListener])` 创建`net.Server`类实例并返回
+
+   - net.createConnection() (别名net.connect()) 创建`net.Socket`类实例并返回
+      - net.createConnection(options[, connectListener])
+      - net.createConnection(path[, connectListener])
+      - net.createConnection(port[, host][, connectListener])  创建tcp连接的socket
+
+  
+   - `net.isIP(input)` 判断字符串是否为ipv4、ipv6地址，返回4(ipv4)、6(ipv6)、0(无效)
+   - `net.isIPv4(input)` 布尔值，判断字符串是否为ipv4地址
+   - `net.isIPv6(input)` 布尔值，判断字符串是否为ipv6地址
+
+2. net模块下的类：
+   1. `net.Server`类(由`net.createServer()`创建)
+      1. 事件：
+         - `close` 服务器关闭触发(调用`server.close()`)
+         - `connection` 创建新的连接触发(`server.listen()`监听成功时触发)
+           - socket net.Socket类实例
+         - `error`
+         - `listening` 服务器绑定后触发(调用`server.listen()`)
+         - `drop` 连接数超过`server.maxConnections`触发
+
+      2. 属性方法：
+         - `new net.Server([options][, connectionListener])` 创建一个服务器实例
+         - `server.address()`
+         - `server.close([callback])` 关闭服务器
+         - `server.getConnections(callback)`
+         - `server.listen()` 为`connection`事件创建一个监听
+            - `server.listen(handle[, backlog][, callback])`
+            - `server.listen(options[, callback])`
+            - `server.listen(path[, backlog][, callback])`
+            - `server.listen([port[, host[, backlog]]][, callback])` 监听端口
+         - `server.listening`
+         - `server.maxConnections` 最大连接数
+         - `server.ref()`
+         - `server.unref()`
+
+   2. Class: net.Socket
+      1. 事件
+         - Event: 'close'
+         - Event: 'connect'
+         - Event: 'data'
+         - Event: 'drain'
+         - Event: 'end'
+         - Event: 'error'
+         - Event: 'lookup'
+         - Event: 'ready'
+         - Event: 'timeout'
 
 
 
-##
+      2. 属性方法
+         - new net.Socket([options])
+         - socket.address()
+         - socket.bufferSize
+         - socket.bytesRead
+         - socket.bytesWritten
+         - socket.connect()
+         - socket.connect(options[, connectListener])
+         - socket.connect(path[, connectListener])
+         - socket.connect(port[, host][, connectListener])
+         - socket.connecting
+         - socket.destroy([error])
+         - socket.destroyed
+         - socket.end([data[, encoding]][, callback])
+         - socket.localAddress
+         - socket.localPort
+         - socket.pause()
+         - socket.pending
+         - socket.ref()
+         - socket.remoteAddress
+         - socket.remoteFamily
+         - socket.remotePort
+         - socket.resetAndDestroy()
+         - socket.resume()
+         - socket.setEncoding([encoding])
+         - socket.setKeepAlive([enable][, initialDelay])
+         - socket.setNoDelay([noDelay])
+         - socket.setTimeout(timeout[, callback])
+         - socket.timeout
+         - socket.unref()
+         - socket.write(data[, encoding][, callback])
+         - socket.readyState
 
 
 
-##
+
+
+
+
+
+
+
+
+
+Class: net.BlockList
+blockList.addAddress(address[, type])
+blockList.addRange(start, end[, type])
+blockList.addSubnet(net, prefix[, type])
+blockList.check(address[, type])
+blockList.rules
+Class: net.SocketAddress
+new net.SocketAddress([options])
+socketaddress.address
+socketaddress.family
+socketaddress.flowlabel
+socketaddress.port
+
+
+
+
+
+
+## zlib 模块
+
+
+
+## util 模块
+
+## crypto 模块
 
 
 
