@@ -1146,58 +1146,58 @@ process.umask(mask)
    6. 抛出未找到模块的错误
 
 
-官方伪代码
-```js
-从 Y 路径的模块 require(X)
-1. 如果 X 是一个核心模块，
-   a. 返回核心模块
-   b. 结束
-2. 如果 X 是以 '/' 开头
-   a. 设 Y 为文件系统根目录
-3. 如果 X 是以 './' 或 '/' 或 '../' 开头
-   a. 加载文件(Y + X)
-   b. 加载目录(Y + X)
-4. 加载Node模块(X, dirname(Y))
-5. 抛出 "未找到"
+   官方伪代码
+   ```js
+   从 Y 路径的模块 require(X)
+   1. 如果 X 是一个核心模块，
+      a. 返回核心模块
+      b. 结束
+   2. 如果 X 是以 '/' 开头
+      a. 设 Y 为文件系统根目录
+   3. 如果 X 是以 './' 或 '/' 或 '../' 开头
+      a. 加载文件(Y + X)
+      b. 加载目录(Y + X)
+   4. 加载Node模块(X, dirname(Y))
+   5. 抛出 "未找到"
+   
+   加载文件(X)
+   1. 如果 X 是一个文件，加载 X 作为 JavaScript 文本。结束
+   2. 如果 X.js 是一个文件，加载 X.js 作为 JavaScript 文本。结束
+   3. 如果 X.json 是一个文件，解析 X.json 成一个 JavaScript 对象。结束
+   4. 如果 X.node 是一个文件，加载 X.node 作为二进制插件。结束
+   
+   加载索引(X)
+   1. 如果 X/index.js 是一个文件，加载 X/index.js 作为 JavaScript 文本。结束
+   3. 如果 X/index.json  是一个文件，解析 X/index.json 成一个 JavaScript 对象。结束
+   4. 如果 X/index.node 是一个文件，加载 X/index.node 作为二进制插件。结束
+   
+   加载目录(X)
+   1. 如果 X/package.json 是一个文件，
+      a. 解析 X/package.json，查找 "main" 字段
+      b. let M = X + (json main 字段)
+      c. 加载文件(M)
+      d. 加载索引(M)
+   2. 加载索引(X)
+   
+   加载Node模块(X, START)
+   1. let DIRS=NODE_MODULES_PATHS(START)
+   2. for each DIR in DIRS:
+      a. 加载文件(DIR/X)
+      b. 加载目录(DIR/X)
+   
+   NODE_MODULES_PATHS(START)
+   1. let PARTS = path split(START)
+   2. let I = count of PARTS - 1
+   3. let DIRS = []
+   4. while I >= 0,
+      a. if PARTS[I] = "node_modules" CONTINUE
+      b. DIR = path join(PARTS[0 .. I] + "node_modules")
+      c. DIRS = DIRS + DIR
+      d. let I = I - 1
+   5. return DIRS
+   ```
 
-加载文件(X)
-1. 如果 X 是一个文件，加载 X 作为 JavaScript 文本。结束
-2. 如果 X.js 是一个文件，加载 X.js 作为 JavaScript 文本。结束
-3. 如果 X.json 是一个文件，解析 X.json 成一个 JavaScript 对象。结束
-4. 如果 X.node 是一个文件，加载 X.node 作为二进制插件。结束
-
-加载索引(X)
-1. 如果 X/index.js 是一个文件，加载 X/index.js 作为 JavaScript 文本。结束
-3. 如果 X/index.json  是一个文件，解析 X/index.json 成一个 JavaScript 对象。结束
-4. 如果 X/index.node 是一个文件，加载 X/index.node 作为二进制插件。结束
-
-加载目录(X)
-1. 如果 X/package.json 是一个文件，
-   a. 解析 X/package.json，查找 "main" 字段
-   b. let M = X + (json main 字段)
-   c. 加载文件(M)
-   d. 加载索引(M)
-2. 加载索引(X)
-
-加载Node模块(X, START)
-1. let DIRS=NODE_MODULES_PATHS(START)
-2. for each DIR in DIRS:
-   a. 加载文件(DIR/X)
-   b. 加载目录(DIR/X)
-
-NODE_MODULES_PATHS(START)
-1. let PARTS = path split(START)
-2. let I = count of PARTS - 1
-3. let DIRS = []
-4. while I >= 0,
-   a. if PARTS[I] = "node_modules" CONTINUE
-   b. DIR = path join(PARTS[0 .. I] + "node_modules")
-   c. DIRS = DIRS + DIR
-   d. let I = I - 1
-5. return DIRS
-```
-
-5. 自写简易模块化[mynodemodule.js](mynodemodule.js)
+5. 自写简易模块化[mymodule.js](mymodule.js)
 
 
 ## vm 模块
@@ -1355,7 +1355,93 @@ socketaddress.port
 
 ## util 模块
 
+1. util模块下的方法：
+   - `util.promisify(original)` 返回错误优先风格的回调作为最后一个参数的函数的promise形式函数
+      >如果原函数最后一个参数不为回调，则返回的函数的返回值为undefined ？
+      >如果原函数对象下有名为`util.promisify.custom`(symbol类型)的属性，则返回此属性的值，此属性值不为函数则报错
+
+
+util.callbackify(original)
+util.debuglog(section[, callback])
+util.debug(section)
+util.deprecate(fn, msg[, code])
+util.format(format[, ...args])
+util.formatWithOptions(inspectOptions, format[, ...args])
+util.getSystemErrorName(err)
+util.getSystemErrorMap()
+util.inherits(constructor, superConstructor)
+util.inspect(object[, options])
+util.inspect(object[, showHidden[, depth[, colors]]])
+util.isDeepStrictEqual(val1, val2)
+util.parseArgs([config])
+util.stripVTControlCharacters(str)
+
+util.toUSVString(string)
+util.types
+util.types.isAnyArrayBuffer(value)
+util.types.isArrayBufferView(value)
+util.types.isArgumentsObject(value)
+util.types.isArrayBuffer(value)
+util.types.isAsyncFunction(value)
+util.types.isBigInt64Array(value)
+util.types.isBigUint64Array(value)
+util.types.isBooleanObject(value)
+util.types.isBoxedPrimitive(value)
+util.types.isCryptoKey(value)
+util.types.isDataView(value)
+util.types.isDate(value)
+util.types.isExternal(value)
+util.types.isFloat32Array(value)
+util.types.isFloat64Array(value)
+util.types.isGeneratorFunction(value)
+util.types.isGeneratorObject(value)
+util.types.isInt8Array(value)
+util.types.isInt16Array(value)
+util.types.isInt32Array(value)
+util.types.isKeyObject(value)
+util.types.isMap(value)
+util.types.isMapIterator(value)
+util.types.isModuleNamespaceObject(value)
+util.types.isNativeError(value)
+util.types.isNumberObject(value)
+util.types.isPromise(value)
+util.types.isProxy(value)
+util.types.isRegExp(value)
+util.types.isSet(value)
+util.types.isSetIterator(value)
+util.types.isSharedArrayBuffer(value)
+util.types.isStringObject(value)
+util.types.isSymbolObject(value)
+util.types.isTypedArray(value)
+util.types.isUint8Array(value)
+util.types.isUint8ClampedArray(value)
+util.types.isUint16Array(value)
+util.types.isUint32Array(value)
+util.types.isWeakMap(value)
+util.types.isWeakSet(value)
+
+1. util模块下的类
+
+Class: util.TextEncoder
+Class: util.TextDecoder
+
 ## crypto 模块
+
+1. crypto模块下的属性和方法
+   - `crypto.getHashes()` 返回支持的hash算法名字
+   - `crypto.createHash(algorithm[, options])` 根据算法的名字创建返回`Hash`类实例
+
+
+
+
+2. crypto模块下的类
+
+   1. `Hash`类(由`crypto.createHash()`创建)
+      继承自`stream.Transform`类
+      - hash.copy([options]) 返回深拷贝`Hash`类实例
+      - hash.digest([encoding]) 将hash值编码导出
+      - hash.update(data[, inputEncoding]) 根据数据更新内部hash值
+
 
 
 

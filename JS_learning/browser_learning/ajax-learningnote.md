@@ -240,35 +240,45 @@ $.ajax({
 
 
 ### 七.同源和跨域
-同源：协议，地址，端口都相同  
-跨域：不满足同源  
-跨域的请求都会受到限制，跨域请求信息的解决方法：  
-1.JSONP（JSON with Padding）:只支持get请求  
-利用一些具有跨域能力的标签,如：img link iframe script
-JSONP利用`<script>`标签可以请求后收到一段js代码并执行，实现跨域请求  
-eg.  
-```js
-//客户端：
-<script src="请求的url"></script>   // 相当于请求回一个js文件
+1. 概念
+   同源：协议，地址，端口都相同  
+   跨域：不满足同源  
+  
+2. JSONP（JSON with Padding）:只支持get请求  
+   利用一些具有跨域能力的标签,如：img link iframe script
+   JSONP利用`<script>`标签可以请求后收到一段js代码并执行，实现跨域请求  
+   eg.  
+   ```js
+   //客户端：
+   <script src="请求的url"></script>   // 相当于请求回一个js文件
 
-//服务端：
-res.end('要执行的javascript代码')  // js代码一般为一个函数，且函数必须在客户端先定义过
-```
-jQuery可以用`$.getJSON()`方法来快速使用JSONP方法
-
-
-2.CORS(Cross-Origin Resourse Sharing)：官方跨域请求方案  
-在服务端设置响应头实现允许跨域  
-```js
-res.setHeader("Access-Control-Allow-Origin","*")       //'*'号通配所以地址，也可以填想要允许的网页地址
-```
-
-可以在[MDN](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS#http_%E5%93%8D%E5%BA%94%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5)找到其他控制ajax请求的头部字段  
+   //服务端：
+   res.end('要执行的javascript代码')  // js代码一般为一个函数，且函数必须在客户端先定义过
+   ```
+   jQuery可以用`$.getJSON()`方法来快速使用JSONP方法
 
 
+3. CORS(Cross-Origin Resourse Sharing)
 
+   1. 简单请求条件：
+      - 请求方法为GET、HEAD、POST
+      - 请求头字段只有Accept、Accept-Language、Content-Language、Content-Type、...，且Content-Type字段为text/plain、multipart/form-data、application/x-www-form-urlencoded
+      - 发起请求的XHR对象没有注册事件监听，且可以通过XMLHttpRequest.upload属性访问
+      - 请求中没有使用可读流
 
+   2. 简单请求：
+      - 请求头添加Origin字段
+      - 响应头返回Access-Control-Allow-Origin、Access-Control-Allow-Credentials、Access-Control-Expose-Headers字段
+      - 如果Access-Control-Allow-Origin包含请求的源，则请求成功
+      - 如果请求失败，则触发XMR对象的error事件
 
+   3. 预检请求:
+      - 请求方法为OPTIONS
+      - 请求头添加Origin、Access-Control-Request-Method、Access-Control-Request-Headers字段
+      - 响应头添加Access-Control-Allow-Origin、Access-Control-Allow-Methods、Access-Control-Allow-Headers、Access-Control-Allow-Credentials、Access-Control-Max-Age字段
+      - 如果Access-Control-Allow-Origin包含请求的源，则预检请求成功
+      - 如果预检请求失败，则触发XMR对象的error事件
+      - 预检请求成功后，发送正式请求，正式请求和简单请求相同
 
 
 ### http常见状态码
@@ -286,7 +296,7 @@ res.setHeader("Access-Control-Allow-Origin","*")       //'*'号通配所以地�
 
 4. 4开头的状态码(客户端错误)
    400 (错误请求)服务器不理解请求的语法
-   401 表示发送的请求需要有通过HTTP认证的认证信息
+   401 (验证失败)表示发送的请求需要有通过HTTP认证的认证信息
    403 (禁止)服务器拒绝请求
    404 (未找到)服务器找不到请求网页
 
@@ -301,6 +311,53 @@ res.setHeader("Access-Control-Allow-Origin","*")       //'*'号通配所以地�
 
 ### http常用请求头
 
+通用字段:
 
+请求头字段:
+
+- `Authorization: Bearer <token>` 用于JWT，携带token发送给服务端进行验证
+
+- `Cookie:<cookies-name>=<cookies-value>` 携带cookies发送请求到客户端(cookie之间用;分隔)
+
+- `Host`
+
+
+- `Origin：<origin>` 请求源的协议、域名、端口
+- `Access-Control-Request-Method:<method>` 正式请求用到的方法
+- `Access-Control-Request-Headers:<headers>` 正式请求中自定义的请求头(用`,`分隔)
+
+响应头字段:
+- `Set-Cookie:<cookie-name>=<cookie-value>;<options-name>=<options-value>` 响应客户端并要求客户端设置或更改cookie
+   >更改cookie条件:选项key、domain、path和secure都匹配(如不同则生成新cookie)
+   options:(option之间用`;`分隔)
+   - Expires UTC格式过期时间
+      >可以用`Date.prototype.toUTCString()`转换  
+   - Max-Age 秒数过期时间
+      >上两项冲突Max-Age优先级更高
+   - Domain 设置所属域名(默认设置为浏览器当前域名)
+      >1. 如果是域名为IP地址，则此选项不能设置
+      >2. 只能设为当前域名或者其上级域名，设为上级域名时，不能设为顶级域名或公共域名
+   - Path 指定浏览器发送请求时，需要附带Cookie的路径
+   - Secure 布尔值，指定浏览器只有在HTTPS下才能发送此Cookie
+   - HttpOnly 布尔值，指定浏览器端不能通过js脚本获取此Cookie
+   - SameSite 枚举值，用于约束三方Cookie(由其他网站引导而附带发送的Cookie)
+     - Strict 完全禁止
+     - Lax 允许导航到目标网址的GET请求携带，其他静止
+     - None 关闭此属性，但必须设置Secure选项
+
+
+
+
+
+
+- `Access-Control-Allow-Origin:*|<origin>` 表示允许请求的源
+- `Access-Control-Allow-Credentials:true` 表示允许发送Cookie
+   >且XHR对象的withCredentials属性也要设置为true，指定源时不能用`*`
+- `Access-Control-Expose-Headers` 表示客户端XHR允许获取的响应头
+   >跨域时，XHR对象默认只能获取Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma六个字段
+
+- `Access-Control-Allow-Methods:<methods>` 服务端允许跨域的方法(用`,`分隔)
+- `Access-Control-Allow-Headers:<headers>` 服务端允许自定义的头部(用`,`分隔)
+- `Access-Control-Max-Age:<seconds>` 预检的缓存时间
 
 

@@ -30,6 +30,9 @@
 4. `<link></link>`外部资源链接
     * 引入CSS文件`<link href="style.css" rel="stylesheet">`
     * href:src
+    * rel 和外部资源的关系
+      * prefetch 预获取链接的资源
+      * preload 预加载链接的资源
     * media：媒体类型，可选值：all,screen,print......
 
 

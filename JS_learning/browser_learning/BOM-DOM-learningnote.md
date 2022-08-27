@@ -123,6 +123,14 @@
       打开打印机选项预览当前页面
    7. `window.postMessage()`
 
+
+3. 事件：
+   - `DOMContentLoaded` 初始的DOM被完全加载后触发，此时没有加载其他资源如样式表，图像
+
+
+
+
+
 ## Location 对象
 
 location 对象在 window 对象和 document 对象下
@@ -187,7 +195,7 @@ url 格式：
    1. `navigator.appCodeName`浏览器代码名
    2. `navigator.appName`返回浏览器的名称
    3. `navigator.appVersion`返回浏览器的平台和版本信息
-   4. `navigator.cookieEnabled`返回指明浏览器中是否启用 cookie 的布尔值
+   4. `navigator.cookieEnabled` 布尔值，是否启用cookie
    5. `navigator.platform`返回运行浏览器的操作系统平台
    6. `navigator.userAgent` 返回由客户机发送服务器的 user-agent 头部的值
    7. `navigator.plugins`插件数组
@@ -299,6 +307,13 @@ url 格式：
       > `CSSStyleSheet.cssRules`对应样式表中的规则，可以通过对象下的其他方法操作
    5. `readyState`描述文档加载状态，随文档加载变化，变化时触发`readystatechange`事件
       > 三个值:loading(正在加载)、interactive(可交互，文档解析完毕，资源还未加载)、complete(文档和所有资源都加载完毕)
+   6. `cookie` Cookie的访问器属性
+      - 读取：全部cookie字符串(用`;`分隔，可用`split(';')`获取)
+      - 写入：写入一个cookie(`<cookie-name>=<cookie-value>;<options-name>=<options-value>`形式，且需要转义,`可用encodeURIComponent`方法)
+
+
+
+
 
 2. 方法
 
@@ -355,6 +370,13 @@ url 格式：
 
    21. `write(string)`、`writeIn(string)`
        老式 API，向文档中写入文本，后者多跟一个换行符
+
+
+3. 事件
+   - `DOMContentLoaded` 初始的DOM被完全加载后触发，此时没有加载其他资源如样式表，图像
+
+
+
 
 ## Node 对象
 
@@ -547,7 +569,6 @@ normalize()
          类似`addEventListener`，但不支持事件捕获
 
    > 区别：
-   >
    > 1. addEventListener 可以定义多个事件处理函数按定义顺序执行，但是多次注册相同的事件处理函数只会执行一次，而 attachEvent 会调用和定义次数相同的次数
    > 2. 前两种事件处理函数中 this 指向事件目标，而 attachEvent 指向 window 对象
 
@@ -589,7 +610,7 @@ normalize()
 
    1. 文档加载：
 
-      1. `DOMContentLoaded`文档 DOM 加载完毕而其他资源没有加载时触发(没有 0 级 DOM 事件处理)
+      1. `DOMContentLoaded`文档DOM加载完毕而其他资源没有加载时触发(没有0级DOM事件处理)
       2. `load`文档相关资源全部加载完毕时触发
       3. `readystatechange`当`document.readyState`变化时触发
       4. ``
@@ -658,13 +679,13 @@ normalize()
       4. `paste`粘贴触发
 
    10. 媒体：
-      1. ``
+      5. ``
 
 
 
    11. ajax进度:
 
-      1. `readystatechange`当`readyState`改变时触发 
+      6. `readystatechange`当`readyState`改变时触发 
       7. `abort`xhr 对象调用`abort()`函数(终止请求)触发
       8. `error`请求遇到错误触发，如断网
       9. `load`xhr 对象请求完成时触发
