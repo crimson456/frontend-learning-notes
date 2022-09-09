@@ -313,6 +313,14 @@ $.ajax({
 
 通用字段:
 
+Date
+
+`Date: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT`
+
+Cache-Control
+Connection
+
+
 请求头字段:
 
 - `Authorization: Bearer <token>` 用于JWT，携带token发送给服务端进行验证

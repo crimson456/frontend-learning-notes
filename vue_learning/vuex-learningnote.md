@@ -28,7 +28,7 @@ export default new Vuex.Store({
 	actions,
 	mutations,
 	state,
-    getters
+   getters
 })
 ```
 引入文件在```main.js```中创建vm时传入```store```配置项  
