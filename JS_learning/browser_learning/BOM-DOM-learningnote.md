@@ -32,8 +32,15 @@
    23. `window.screen`访问 Screen 对象
    24. `window.console`访问 Console 对象
 
-   25. `window.sessionStorage`
-   26. `window.localStorage`
+
+
+   25. `window.performance`访问 Performance 对象
+
+
+
+
+   1.  `window.sessionStorage`
+   2.  `window.localStorage`
 
 2. 方法：
 
@@ -401,6 +408,7 @@ url 格式：
 
    2. `appendChild(node)`
       将指定节点添加到末尾处，如果已存在，则移动到新位置
+      >将本身在DOM上的节点添加到其他节点下会将原位置的移除
 
    3. `insertBefore(newNode,referenceNode)`
       在父节点的参考节点前添加新节点并返回，如第二个参数不加，则和`appendChild()`方法相同
@@ -766,3 +774,28 @@ normalize()
 3. NodeList 和 HTMLCollection 类数组，前者是 Node 对象的集合，后者是 Element 对象的集合
 4. DocumentFragment 对象是特殊 Node 节点，有类似 Node 节点的方法，是一片 Node 节点及其子孙节点的集合
 5. iframe 元素可以通过`window[]`、`window.frames`、`getElementById()`访问属性，iframe 元素下的 contentWindow 可以访问框架下的 window 对象，contentDocument 可以访问框架下的 document 对象，不过由于同源策略，window 对象的属性基本都不能访问
+
+
+
+
+
+## Performance 对象
+用于记录当前页面中与性能相关的信息，比如记录初始化时间等等，vue2.x使用
+
+1. 属性
+
+   - timeOrigin
+
+2. 方法
+   - clearMarks()
+   - clearMeasures()
+   - clearResourceTimings()
+   - getEntries()
+   - getEntriesByName()
+   - getEntriesByType()
+   - mark()
+   - measure()
+   - now()
+   - setResourceTimingBufferSize()
+   - toJSON()
+
