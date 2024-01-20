@@ -130,6 +130,9 @@
       打开打印机选项预览当前页面
    7. `window.postMessage()`
 
+   8. 绘制帧相关
+      1. `requestAnimationFrame(cb)`   似乎是每个绘制帧之后调用回调
+
 
 3. 事件：
    - `DOMContentLoaded` 初始的DOM被完全加载后触发，此时没有加载其他资源如样式表，图像
@@ -393,7 +396,7 @@ url 格式：
    2. `childNodes`子节点 NodeList 对象
    3. `firstChild`、`lastChild`第一个和最后一个子节点
    4. `nextSibling`、`previousSibling`前后的兄弟节点
-   5. `nodeType`节点类型
+   5. `nodeType`节点类型  具体类型[参考MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/Node/nodeType)
    6. `nodeValue`Text 节点或 Comment 节点的文本内容
    7. `nodeName`元素节点标签名大写
    8. `textContent`节点及其后代的文本内容
@@ -475,7 +478,8 @@ normalize()
        > `HTMLElement.style.cssText`也可以直接修改属性或者获取内联属性
 
    18. `className`对应 HTML 中的 class 属性，多个用空格分开(因为 js 中 class 为定义类的关键字)
-   19. `classList`对应 HTML 中的 class 属性的 DOMTokenList 对象
+   19. `classList`对应 HTML 中的 class 属性的 DOMTokenList 对象，此对象下的方法用于动态操作元素的class
+      > 区别：classList可以不用覆盖原本的属性
 
    20. ``
 
@@ -704,7 +708,7 @@ normalize()
 
    12. 存储：
       
-       1.  `storage`存储区域被修改时触发
+       1. `storage`存储区域被修改时触发
 
 
 
@@ -798,4 +802,22 @@ normalize()
    - now()
    - setResourceTimingBufferSize()
    - toJSON()
+
+
+
+## FormData 对象
+
+1. 构造函数： `new FormData(form)`
+   - form 表单元素HTMLFormElement
+
+2. 方法
+
+
+
+
+
+
+
+
+
 

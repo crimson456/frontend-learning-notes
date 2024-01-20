@@ -5,11 +5,34 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <title>Document</title>
 </head>
 
 <body>
-    <input id='aaa' type="text" placeholder="123">
+
+    <div id="test">
+        <div>aaa</div>
+        <input :type="type">xxx</input>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#test',
+            data: {
+                show: true,
+                type: 'radio'
+            },
+            methods: {
+                switchcom() {
+                    this.show = !this.show
+                }
+            },
+
+        });
+        setTimeout(() => {
+            vm.type = 'checkbox'
+        }, 3000);
+    </script>
     <script src="test.js"></script>
 </body>
 

@@ -30,13 +30,13 @@ new SyncHook(arr)
 
 
 注册/触发方式：(一一对应)
-1. 同步  `tap(pluginName)`/`call(...arr)`
+1. 同步  `hookInstance.tap(pluginName)`/`hookInstance.call(...arr)`
 
-2. 异步  `tapAsync(pluginName,callback)`/`callAsync(...arr,callback)`
+2. 异步  `hookInstance.tapAsync(pluginName,callback)`/`hookInstance.callAsync(...arr,callback)`
    >注册方法的callback的最后一个参数为next函数，next()函数必须调用才会执行下一个回调，如果传值则结束触发，执行触发方法的callback
    >触发方法的callback只有一个参数为err
 
-3. 异步promise  `tapPromise(pluginName,callback)`/`promise(...arr)`
+3. 异步promise  `hookInstance.tapPromise(pluginName,callback)`/`hookInstance.promise(...arr)`
    >注册方法的callback返回一个Promise实例，所有Promise实例都兑现或者有失败时可以调用触发方法的then方法
    >相当于使用Promise.all方法处理所有注册的Promise实例
 

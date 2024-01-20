@@ -76,7 +76,6 @@
             `background-image: repeating-radial-gradient()`
 
 
-    
 2. 字体相关：font
     * `color`字体颜色
     * `font-size`字体大小
@@ -442,7 +441,7 @@
 7. 引入外部css
     * `@import url("")|"url" mediaqueries`
 
-## 三.相关概念
+## 五.相关概念
 1. 长度单位：
    * `px`     像素
    * `%`      百分比
@@ -455,6 +454,32 @@
     * `rgba(R,G,B,A)`    A为透明度0~1之间
     * `#ffffff`          十六进制表示
     * 还有HSL和HSLA颜色,不常用,可查文档
+
+
+## 六.常见问题记录
+
+1. 边框border会撑大盒子，加入边框时要维持原大小，需要将盒子的宽高变小
+2. 设置边框时border-style必须指定，否则不显示
+3. 计算盒子大小是从border开始算的，父盒子中排列子盒子，如果子盒子有margin，则margin部分可能会超出
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

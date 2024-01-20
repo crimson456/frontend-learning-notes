@@ -281,28 +281,134 @@ $.ajax({
       - 预检请求成功后，发送正式请求，正式请求和简单请求相同
 
 
+### 请求方法
+
+- GET
+- POST
+- PURGE 删除缓存
+- HEAD 只返回头部
+
+
 ### http常见状态码
+
 1. 1开头的状态码(信息类)
-   100 接受的请求正在处理，信息类状态码
+   100 Continue 接受的请求正在处理，信息类状态码
+   101 Switching Protocols
+   102 Processing
+   103 Early Hints
+
 
 2. 2开头的状态码(成功类)
-   200 (成功)服务器已成功处理了请求
+   200 OK 服务器已成功处理了请求
+   204 No Content 
+
+
+   201 Created
+   202 Accepted
+   203 Non-Authoritative Information
+   205 Reset Content
+   206 Partial Content
+   207 Multi-Status
+   208 Already Reported
+   226 IM Used
+
+
 
 3. 3开头的状态码(重定向)
-   301 永久性重定向，表示资源已被分配了新的 URL
+   300 Multiple Choices
+   301 永久性重定向，表示资源已被分配了新的 URL，浏览器会有缓存
    302 临时性重定向，表示资源临时被分配了新的 URL
    303 表示资源存在另一个URL，用GET方法获取资源
-   304 (未修改)自从上次请求后，请求网页未修改过。服务器返回此响应时，不会返回网页内容
+   304 Not Modified 自从上次请求后，请求网页未修改过。服务器返回此响应时，不会返回网页内容
+   307 服务器内部重定向
+
+300 Multiple Choices
+301 Moved Permanently
+302 Found
+303 See Other
+304 Not Modified
+307 Temporary Redirect
+308 Permanent Redirect
+
 
 4. 4开头的状态码(客户端错误)
-   400 (错误请求)服务器不理解请求的语法
-   401 (验证失败)表示发送的请求需要有通过HTTP认证的认证信息
+   400 Bad Request 服务器不理解请求的语法
+   401 Unauthorized 未认证，客户端需要传入用户名和密码进行认证(可在url中或请求头中)
    403 (禁止)服务器拒绝请求
    404 (未找到)服务器找不到请求网页
+   406 Not Acceptable 
+   408 Request Timed Out 请求超时
 
-5. 5开头的状态码(服务器错误)
+   412 Precondition Failed 一般用于请求修改的数据已经被其他人修改过
+   413 request Entity Too Large 请求体过大
+   414 Request-URI Too Large 请求uri过长
+
+   415 Unsupported Media Type 不支持的媒体类型，返回的图片格式代理无法处理
+
+
+
+
+
+
+402 Payment Required
+403 Forbidden
+404 Not Found
+405 Method Not Allowed
+406 Not Acceptable
+407 Proxy Authentication Required
+408 Request Timeout
+409 Conflict
+410 Gone
+411 Length Required
+412 Precondition Failed
+413 Content Too Large
+414 URI Too Long
+415 Unsupported Media Type
+416 Range Not Satisfiable
+417 Expectation Failed
+418 I'm a teapot
+421 Misdirected Request
+422 Unprocessable Content
+423 Locked
+424 Failed Dependency
+425 Too Early
+426 Upgrade Required
+428 Precondition Required
+429 Too Many Requests
+431 Request Header Fields Too Large
+451 Unavailable For Legal Reasons
+
+
+
+
+1. 5开头的状态码(服务器错误)
    500 (服务器内部错误)服务器遇到错误，无法完成请求
+   502 代理服务器从后端服务器收到伪相应
    503 表示服务器处于停机维护或超负载，无法处理请求
+   504 网关超时
+
+
+
+
+
+
+
+
+
+500 Internal Server Error
+501 Not Implemented
+502 Bad Gateway
+503 Service Unavailable
+504 Gateway Timeout
+505 HTTP Version Not Supported
+506 Variant Also Negotiates
+507 Insufficient Storage
+508 Loop Detected
+510 Not Extended
+511 Network Authentication Required
+
+
+
 
 
 
@@ -311,14 +417,46 @@ $.ajax({
 
 ### http常用请求头
 
+以`X-`开头的一般为自定义的请求头
+
+
 通用字段:
 
-Date
 
-`Date: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT`
 
-Cache-Control
-Connection
+- `Date: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT`
+
+
+- `Connection:<keep-alive|close>` http 1.0,keep-alive表示长连接,http 1.1之后默认所有连接都是长连接显式指定close关闭连接
+
+
+- `Transfer-Encoding:chunked` 传输报文主体时采用的传输编码方式，http1.1之后只能使用chunked编码。传输编码在内容编码之后。chunked传输编码分段传输，最后一个大小为 0 的块为结束，不需要通过content-length结束传输，无需等待整个响应准备完成，降低延迟。
+
+
+
+- `Via:<proxy>...` 记录了请求经过的代理服务器的信息，包括协议版本，域名，服务器型号
+
+
+
+- `Cache-Control:<param>...` 指定缓存的工作机制(主要是强制缓存),参数包括：
+  - no-store 表示不使用强制缓存和协商缓存(使用此字段会失去浏览器的后退/前进缓存)
+  - no-cache 表示不使用强制缓存，客户端每次使用缓存都要进行协商
+  - max-age=10 强制缓存的相对时间(秒数)，和Expires同时出现时，max-age优先级更高
+  - no-transform 缓存不能改变其媒体类型，比如不能压缩
+  - 用于请求头中：
+    - max-stale=10 接收超过max-age但没超过max-stale的缓存(默认全部接收)
+    - min-fresh=10 不接受超过min-fresh的缓存
+    - only-if-cached 只从缓存(本地缓存和缓存服务器)中获取资源，失败返回504 Gateway Timeout
+  - 用于响应头中：
+    - public 表示可以被任何节点缓存，包括客户端和公共缓存服务器
+    - private 表示该资源只能被客户端（浏览器）缓存
+    - s-maxage=10 资源在公共服务器中缓存的相对时间。如果存在公共缓存服务器，浏览器缓存失效后，会先请求公共缓存服务器，公共缓存服务器失效后会重新请求资源服务器更新公共缓存服务器中的资源，然后返回给浏览器
+    - must-revalidate 缓存过期后做有效性验证(有些情况可以直接使用过期缓存)
+    - proxy-revalidate 对于缓存服务器，缓存过期后做有效性验证
+
+
+
+
 
 
 请求头字段:
@@ -327,12 +465,86 @@ Connection
 
 - `Cookie:<cookies-name>=<cookies-value>` 携带cookies发送请求到客户端(cookie之间用;分隔)
 
-- `Host`
+
+- `Host` 请求发送到的主机名和端口
 
 
-- `Origin：<origin>` 请求源的协议、域名、端口
+- `Origin：<origin>` 跨域请求的源请求的协议、域名、端口，除了不包含路径信息，该字段与 Referer 字段相似
 - `Access-Control-Request-Method:<method>` 正式请求用到的方法
 - `Access-Control-Request-Headers:<headers>` 正式请求中自定义的请求头(用`,`分隔)
+
+
+- `X-Real-IP:<ip>` 发送请求的服务器的前项服务器的ip，一般为Remote Address字段
+- `X-Forwarded-For: <client>, <proxy1>, <proxy2>...` 代理服务器转发请求时，前项代理服务器(不包括本机)和客户端的IP地址，本代理服务器的IP通过后项服务器的Remote Address字段获取并添加在字段上
+
+
+- `Referer:<uri>` 当前请求页面的来源页面的地址，即表示当前页面是通过此来源页面里的链接进入的，用于防盗链
+
+
+- accept相关头部告知服务器用户代理支持的媒体类型、自然语言集、字符集、内容编码方式。q=?表示权重值，用分号;进行分隔,范围是 0~1，可精确到小数点后 3 位,默认为q=1.0，当服务器提供多种内容时，将会首先返回权重值最高的媒体类型。
+- `Accept:<mimeType1>;q=0.8,<mimeType2>...` 
+- `Accept-Language:<language>;q=0.8...`
+- `Accept-Charset:<charset>;q=0.8...`
+- `Accept-Encoding:<encode>;q=0.8...` 常用有gzip、deflate、compress、identity,可用星号*通配符
+
+- `TE:<encode>;q=0.8...` 告知服务器客户端能够处理响应的传输编码方式和优先级
+
+
+
+
+- `If-Modified-Since:<GMT>` 用于请求相同资源时是否使用缓存(协商缓存)
+
+- `If-None-Match:<etag-value>` 用于协商缓存，服务器收到请求后会与资源最新的ETag对比，成功返回304 Not Modified
+
+- `If-Match:<etag-value>` 对于 GET 和 HEAD 方法，搭配 Range使用，用于保证新请求的范围与之前请求的范围是对同一份资源的请求，失败返回 416 Range Not Satisfiable。 对于PUT方法, 用于避免更新丢失问题，它可以用来检测用户想要上传的不会覆盖获取原始资源之后做出的更新，失败返回 412 Precondition Failed。
+
+- `If-Unmodified-Since:<GMT>` 告知服务器，指定的请求资源未发生更新的情况下才能处理，请求比如提交文件覆盖时，原文件已经被修改不能直接覆盖。失败返回 412 Precondition Failed。
+
+
+Range
+If-Range
+
+
+
+
+
+- `Authorization: <auth-scheme> <authorization-parameters>` 客户端返回服务器要求附带的认证信息，auth-scheme为认证方式，authorization-parameters为认证的其他参数
+
+- `Proxy-Authorization: <auth-scheme> <authorization-parameters>` 客户端返回代理服务器要求附带的认证信息
+
+
+
+pragma
+
+upgrade-insecure-requests
+
+
+
+
+
+
+
+
+
+Connection: Upgrade
+Upgrade: websocket
+Sec-WebSocket-Version: 13
+Sec-WebSocket-Key: d4egt7snxxxxxx2WcaMQlA==
+Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 响应头字段:
 - `Set-Cookie:<cookie-name>=<cookie-value>;<options-name>=<options-value>` 响应客户端并要求客户端设置或更改cookie
@@ -367,5 +579,63 @@ Connection
 - `Access-Control-Allow-Methods:<methods>` 服务端允许跨域的方法(用`,`分隔)
 - `Access-Control-Allow-Headers:<headers>` 服务端允许自定义的头部(用`,`分隔)
 - `Access-Control-Max-Age:<seconds>` 预检的缓存时间
+
+
+- `Strict-Transport-Security: max-age=<expire-time>; includeSubDomains; preload` 通知浏览器，这个网站禁止使用 HTTP 方式加载，并且浏览器应该自动把所有尝试使用 HTTP 的请求自动替换为 HTTPS 请求
+  - max-age 自动重定向到https页面的有效时间，超时后恢复到http访问
+  - includeSubDomains 添加则说明适用于该网站的所有子域名
+  - preload 预加载HSTS
+
+
+- `Vary:<header1>,<header2>...` 如果服务端提供的内容取决于除了协商字段的请求头字段（比如多端不同的页面根据User-Agent字段判断），那么响应头中必须包含Vary字段，且Vary的内容必须包含这些请求头字段。此字段用于告诉缓存服务器遇到同一个URL对应着不同版本文档的情况时，如何缓存和选择合适的版本。对于有些实现得有BUG的缓存服务器，会忽略响应头中的 Content-Encoding，增加Vary:Accept-Encoding 响应头，明确告知缓存服务器按照 Accept-Encoding 字段的内容，分别缓存不同的版本。
+
+
+
+
+- `WWW-Authenticate: <auth-scheme> <authorization-parameters>,...` 服务器对客户端发起认证，发起时返回401，auth-scheme为认证方式，authorization-parameters为对应认证方式的参数。可以有多种认证方式，以逗号分隔或多个WWW-Authenticate请求头
+  - basic：`WWW-Authenticate: Basic realm=<realm>, charset="UTF-8"` realm为安全域，会放入浏览器对话框提示
+- `Proxy-Authenticate: <auth-scheme> <authorization-parameters>` 代理服务器对客户端发起认证，发起时返回407
+
+
+- `Location: <url>` 重定向地址 
+
+
+- `Server: Apache/2.2.6 (Unix) PHP/5.2.5 ` 告知客户端当前服务器上安装的 HTTP 服务器应用程序的信息
+
+Accept-Ranges
+
+
+
+Connection: Upgrade
+Upgrade: websocket
+Sec-WebSocket-Accept: gczJQPmQ4Ixxxxxx6pZO8U7UbZs=
+
+
+
+
+X-Accel-Expires
+
+- `X-Cache-Status:<cacheStatus>` nginx中用于返回响应缓存的使用命中情况
+
+
+
+
+
+
+
+
+
+
+
+实体头部：
+
+- `Content-Encoding:<encode>` 主体部分选用的内容编码方式，参考Accept-Encoding首部字段
+
+
+- `Last-Modified:<GMT>` 指定资源最终修改的时间，再次访问相同资源时会放在If-Modified-Since中，用于协商缓存。Last-Modified只能监听到秒级文件修改，如果1秒内多次修改文件，会导致资源没有及时更新，此时使用Etag进行协商。
+- `Etag:<etag-value>` 标记资源的唯一性，一般使用内容的散列
+- `Expires:<GMT>` 指定资源的(强制缓存)失效日期，Cache-Control中max-age优先级更高
+
+
 
 

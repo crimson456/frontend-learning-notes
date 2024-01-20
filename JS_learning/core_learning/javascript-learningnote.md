@@ -46,6 +46,8 @@
      - `delete`删除属性
      - `in`查询是否为属性
      - `instanceof`查询是否为实例
+     - `?.` 链判断运算符 (`a?.b?.c`相当于`a && a.b && a.b.c`)
+     - `??` 前值为null和undefined取后值，其他取前值
    - 不常用：
      - `void` 执行函数或表达式并返回undefined
      - 按位左移右移...
@@ -363,11 +365,11 @@
          p2 为当前项值，p3 为索引值，p4 为遍历的数组,p5 为回调函数的 this 指向
 
       4. `Array.prototype.every(p1(p2,p3,p4),p5)`
-         对数组的每一项执行 p1 回调函数，如果任意一项回调返回假，则返回假，反之返回真
+         对数组的每一项执行 p1 回调函数，如果任意一项回调都返回假，则返回假，反之返回真
          p2 为当前项值，p3 为索引值，p4 为遍历的数组,p5 为回调函数的 this 指向
 
       5. `Array.prototype.some(p1(p2,p3,p4),p5)`
-         对数组的每一项执行 p1 回调函数，如果任意一项回调返回真，则返回真，反之返回假
+         对数组的每一项执行 p1 回调函数，如果任意一项回调都返回真，则返回真，反之返回假
          p2 为当前项值，p3 为索引值，p4 为遍历的数组,p5 为回调函数的 this 指向
 
       6. `Array.prototype.findIndex(p1(p2,p3,p4),p5)`
@@ -832,7 +834,7 @@
 
 
 3. 原生的可迭代对象相关方法
-   1. `Array|TypedArray|String|Map|`Set.prototype[Symbol.iterator]()``
+   1. `Array|TypedArray|String|Map|Set.prototype[Symbol.iterator]()`
       返回包含键值的迭代器
       >注意：此方法要调用后获取返回值为迭代器，不是属性
 
@@ -952,6 +954,7 @@
    async函数返回一个Promise对象，async函数中的返回值作为返回对象的then方法的resolve函数参数
 
 
+   await语句接promise对象得到的值为promise对象兑现后的值
 
    >注意：
    >1. await命令后面的Promise对象，运行结果可能是rejected，所以最好把await命令放在try...catch代码块中
