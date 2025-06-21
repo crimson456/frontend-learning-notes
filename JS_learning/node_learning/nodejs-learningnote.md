@@ -446,8 +446,8 @@ myEmitter.emit('event');
 
    - `fs.rm(path[, options], callback)` 移除文件或目录
 
-   - `fs.createReadStream(path[, options])` 创建可读流
-   - `fs.createWriteStream(path[, options])` 创建可写流
+   - `fs.createReadStream(path[, options])` 创建文件可读流
+   - `fs.createWriteStream(path[, options])` 创建文件可写流
 
    - `fs.truncate(path[, len], callback)` 修改文件的长度(截短或增长)
    - `fs.utimes(path, atime, mtime, callback)` 修改文件的最后修改时间和最后访问时间的时间戳
@@ -456,22 +456,22 @@ myEmitter.emit('event');
    - `fs.watchFile(filename[, options], listener)` 监听文件变化，返回`fs.StatWatcher`类实例
    - `fs.unwatchFile(filename[, listener])` 移除监听文件的监听器
 
-   `fs.open(path[, flags[, mode]], callback)` 打开文件，回调中有参数`fd`(文件描述符)，可根据`fd`执行文件内  容读写操作,回调中可执行的方法
-      - `fs.close(fd[,callback])` 关闭文件
-      - `fs.write(fd,buffer,offset[,length[,position]],callback)`、`fs.write(fd,buffer[,options],callback)`、`fs.write(fd,string[,position[,encoding]],callback)` 写入数据
-      - `fs.read(fd,buffer,offset,length,position,callback)`、`fs.read(fd[,options],callback)`、`fs.read(fd,buffer[,options],callback)` 读取数据 
+   - `fs.open(path[, flags[, mode]], callback)` 打开文件，回调中有参数`fd`(文件描述符)，可根据`fd`执行文件内容读写操作,回调中可执行的方法
+   - `fs.close(fd[,callback])` 关闭文件
+   - `fs.write(fd,buffer,offset[,length[,position]],callback)`、`fs.write(fd,buffer[,options],callback)`、`fs.write(fd,string[,position[,encoding]],callback)` 写入数据
+   - `fs.read(fd,buffer,offset,length,position,callback)`、`fs.read(fd[,options],callback)`、`fs.read(fd,buffer[,options],callback)` 读取数据 
 
-      - `fs.writev(fd,buffers[,position],callback)` ？
-      - `fs.readv(fd,buffers[,position],callback)` ？
+   - `fs.writev(fd,buffers[,position],callback)` ？
+   - `fs.readv(fd,buffers[,position],callback)` ？
 
-      - `fs.fchmod(fd,mode,callback)` 
-      - `fs.fchown(fd,uid,gid,callback)` 
-      - `fs.fdatasync(fd,callback)` 
-      - `fs.fstat(fd[,options],callback)` 
-      - `fs.fsync(fd,callback)` 
-      - `fs.ftruncate(fd[,len],callback)` 
-      - `fs.futimes(fd,atime,mtime,callback)` 
-      >f开头的方法用于open方法代开文件后,和对应的版方法使用相同
+   - `fs.fchmod(fd,mode,callback)` 
+   - `fs.fchown(fd,uid,gid,callback)` 
+   - `fs.fdatasync(fd,callback)` 
+   - `fs.fstat(fd[,options],callback)` 
+   - `fs.fsync(fd,callback)` 
+   - `fs.ftruncate(fd[,len],callback)` 
+   - `fs.futimes(fd,atime,mtime,callback)` 
+   >f开头的方法用于open方法代开文件后,和对应名称的原方法使用相同
 
    - `fs.lchmod(path,mode,callback)` 
    - `fs.lchown(path,uid,gid,callback)` 
@@ -641,7 +641,6 @@ myEmitter.emit('event');
 1. 可读流的类：`stream.Readable`
    
    1. 事件：
-
       - `data` 流动模式读取数据
       - `readable` 暂停模式读取数据，触发条件:下一个事件循环缓存区字节长度小于highWaterMark、默认触发一次、数据全被读到缓存区触发一次
          >readable每次触发存入highWaterMark定义的字节长度，如果缓存区的字节长度小于highWaterMark，则补充highWaterMark字节长度的数据
@@ -700,6 +699,7 @@ myEmitter.emit('event');
 
 
 2. 可写流的类：`stream.Writable`
+
    1. 事件：
       
       - `drain` 缓冲区超过水位线后暂停写入，等系统消费完缓冲区的数据后触发drain事件
@@ -766,12 +766,12 @@ myEmitter.emit('event');
 5. 转换流的类:`stream.Transform `
    - 继承自`stream.Readable`、`stream.Writable`
 
-6. 重写自己的流：
-   继承对应流的类，不同的流需要重写内部方法
-   - 可读流
-   - 可写流
-   - 双工流
-   - 转换流
+6. 实现自己的流：
+   继承对应流的类，且不同的流需要实现内部的抽象方法
+   - 可读流 _read
+   - 可写流 _write
+   - 双工流 _read、_write
+   - 转换流 _transform
 
 
 ## global 全局对象
@@ -1370,7 +1370,7 @@ util.formatWithOptions(inspectOptions, format[, ...args])
 util.getSystemErrorName(err)
 util.getSystemErrorMap()
 util.inherits(constructor, superConstructor)
-util.inspect(object[, options])
+util.inspect(object[, options]) 将对象转化为字符串
 util.inspect(object[, showHidden[, depth[, colors]]])
 util.isDeepStrictEqual(val1, val2)
 util.parseArgs([config])

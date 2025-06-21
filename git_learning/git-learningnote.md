@@ -138,7 +138,7 @@
     - `git reset HEAD <file-url>`取消暂存区的文件，工作区不受影响
 
 13. 从暂存区到工作区
-    - `git checkout -- <file-url>`撤销工作区文件的修改（从暂存区）
+    - `git checkout -- <file-url>` 撤销工作区文件的修改（从暂存区），但是不会删除未跟踪的文件
 
 14. 查看当前项目的远程仓库
     - `git remote [-v]` 查看当前项目远程仓库的别名
@@ -339,7 +339,7 @@ git add {-i|--interactive} 开启交互式暂存工具
     - `git stash branch <branch> [stash@{n}]` 从贮藏栈取出一项贮藏并根据创建贮藏时的提交创建一个分支并将贮藏应用在此分支上
 
 
-    - `git clean [-f|--force] [-d] [-n|--dry-run] [-i|--interactive] [-x|-X]`清除未追踪的文件（不包括目录，目录中的文件默认不会递归清除）（忽略文件中规定的文件不会被清除）
+    - `git clean [-f|--force] [-d] [-n|--dry-run] [-i|--interactive] [-x|-X]` 清除未追踪的文件（不包括目录，目录中的文件默认不会递归清除）（忽略文件中规定的文件不会被清除）
         - `-f|--force`强制清除
         - `-d` 递归清除未追踪的目录内部，包括目录本身
         - `-n|--dry-run` 进行一次模拟清除，打印输出要清除的文件

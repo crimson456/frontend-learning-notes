@@ -1,0 +1,44 @@
+
+
+## lerna 基本命令
+
+- lerna init 初始化lerna项目，创建lerna.json
+- lerna create 创建子项目
+- lerna list 查看已有项目
+
+lerna version
+lerna publish
+lerna changed
+
+lerna add-caching
+
+lerna clean
+
+lerna diff
+lerna exec
+lerna import
+lerna info
+lerna run
+lerna watch
+
+lerna repair 用于更新lerna版本后进行修复
+
+
+
+
+
+## lerna.json中的配置
+
+npmClient 使用的包管理器，lerna会根据此项完善自身的配置和包的位置，如果不是用npm此配置非常重要
+
+packages 包的存放路径，默认会从包管理器的配置解析
+
+version 绑定模式：统一使用的版本号。 独立模式：设置为字符串"independent"
+
+command 为lerna命令行指令配置默认参数
+
+$schema 使用文本编辑器的提示定义位置,jsonschema可以描述json文件的字段内容
+
+useWorkspaces 旧版本配置，是否包管理配合使用workspaces
+
+## Nx.json

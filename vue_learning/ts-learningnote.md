@@ -1,6 +1,8 @@
 # TS Learning
 
 
+## ts类型
+
 基本类型：
 - 基础类型：`number`、`string`、`boolean`、`enum`、`any`、`void`、`null`、`undefined`、`never`、`object`、`symbol`
 - 字面量类型
@@ -215,11 +217,11 @@ interface xxx<T>{
 
 ## 模块化
 
-- `export = xxx`、`import xxx =require('')`语法：用于node后端cjs引入ts模块时支持ts的类型识别
+- `export = xxx`、`import xxx = require('')`语法：用于node后端cjs引入ts模块时支持ts的类型识别
 - 打包工具构建时使用es6模块时直接使用默认语法
 
 - `declare`声明语法:全局声明，不能声明实现
-- `declare module 'xxx'{}`库类中声明模块
+- `declare module 'xxx'{}` 声明外部模块，注意路径为相对路径时不会解析到此处的外部模块定义
 
 
 

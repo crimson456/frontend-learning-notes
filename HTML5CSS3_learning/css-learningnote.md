@@ -9,7 +9,8 @@
 6. 并集选择器：`选择器1,选择器2,选择器3{}`以逗号分隔
 7. 后代选择器：`选择器1 选择器2{}`以空格分隔
 8. 子选择器：`选择器1>选择器2{}`以大于符号分隔
-9. 相邻兄弟选择器：`选择器1+选择器2{}`以加号分隔
+9. 向后相邻兄弟选择器：`选择器1+选择器2{}`以加号分隔
+    >注意是是所有在选择器1后的第一个选择器2
 10. 普通兄弟选择器：`选择器1~选择器2{}`以波浪号分隔
 11. 属性选择器：
     * `[attribute]{}`所有包含attribute属性的元素
@@ -165,7 +166,7 @@
 
   
 9.  文本相关：
-    * `line-height`设置行高
+    * `line-height`设置行高,可以是倍数(相对height)、px、百分比，一般设为1.5-2
     * `direction`设置文本顺序，可选值：ltr(从左到右)，rtl(从右到左)
     * `letter-spacing`设置字符间距(中文字间距也是此属性)
     * `word-spacing`设置单词间距
@@ -189,6 +190,7 @@
     * `transition-timing-function`过渡效果的速度，可以用函数cubic-bezier(n,n,n,n)定义平滑的过渡效果或者steps()定义分步的过渡效果，有几个常用值
     * `transition-delay`延时进行过渡效果
     * `transition: property duration timing-function delay`
+
 11. 动画：(animation、@keyframes)
     * 创建关键帧(定义动画的效果)
         ```css
@@ -271,8 +273,9 @@
         * `order`子元素排列的顺序，数值越小越靠前，默认为0，等值时按html中顺序
         * `flex-grow`子元素的放大权重，默认为0，不放大(即有剩余空间则按各元素的权重分配)
         * `flex-shrink`子元素的缩小权重，默认为1(容器控件不足时按个元素权重进行缩小)
-        * `flex-basis`子元素的主轴长度（剩余空间计算的一句），可选值：auto(默认，即等于子元素的本来大小)，content(根据内容而定)，长度值
+        * `flex-basis`子元素的主轴长度（剩余空间计算的依据），可选值：auto(默认，即等于子元素的本来大小)，content(根据内容而定)，长度值
         * `flex:flex-grow flex-shrink flex-basis`简写属性
+          - flex布局会根据容器空间减去所有盒模型的大小(很多时候使用flex布局不会规定盒模型的大小)计算剩余空间，在分配给盒模型缩放权重 
         * `align-self: auto | flex-start | flex-end | center | baseline | stretch`与align-items属性完全一致
 
 14. grid布局相关:
@@ -345,7 +348,9 @@
     * `list-style-position`设置列表项前面标记的位置,可选值:inside和outside
     * `list-style-image`设置列表项前的图片标记,值为`url('地址')`,图片无法加载时回退到`list-style-type`指定的标记
     * `list-style: list-style-type list-style-position list-style-image`
-21. ``
+21. 鼠标相关
+    * `cursor` 设置元素上光标的样式，可以使用url指定图片
+    * `pointer-events` 光标点击元素时是否触发点击事件
 
 
 
@@ -461,6 +466,7 @@
 1. 边框border会撑大盒子，加入边框时要维持原大小，需要将盒子的宽高变小
 2. 设置边框时border-style必须指定，否则不显示
 3. 计算盒子大小是从border开始算的，父盒子中排列子盒子，如果子盒子有margin，则margin部分可能会超出
+4. 调整文本上下对齐时，font-size指定的是字体框的高度，文本实际可能超出字体框
 
 
 
